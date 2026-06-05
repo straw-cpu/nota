@@ -4,9 +4,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>笔记标题</title>
+<title>GPC Part I §1</title>
 
 <meta name="generator" content="mynotes (academic_lecture, v1)">
+<meta name="mynotes:created-at" content="2026-06-05">
+<meta name="mynotes:template" content="academic_lecture">
+<meta name="mynotes:theme" content="default">
 
 <script>
 window.MathJax = {
@@ -202,12 +205,6 @@ pre code, pre code.hljs {
   font-family: "JetBrains Mono", "SF Mono", "Menlo", monospace;
   color: var(--ink);
 }
-pre.diagram {
-  background: #f9f6ed;
-  border-left: 4px solid var(--accent);
-  font-size: 12.5px;
-  line-height: 1.4;
-}
 
 .callout {
   margin: 16px 0;
@@ -291,14 +288,12 @@ footer.note-footer {
   color: var(--ink-muted);
 }
 
-/* TOC scrollspy active state */
 nav.toc a.active {
   color: var(--accent);
   font-weight: 600;
   border-bottom-color: var(--accent);
 }
 
-/* Long-code auto-collapse */
 details.code-card {
   margin: 14px 0;
   background: #fafaf6;
@@ -346,47 +341,175 @@ details.code-card > pre { margin: 0; padding: 0; border: none; border-left: none
 <nav class="toc">
   <h3>目录</h3>
   <ol>
-    <li><a href="#sec1">第一章</a></li>
-    <li><a href="#sec2">第二章</a></li>
+    <li><a href="#sec-abstract">摘要与背景</a>
+      <ul>
+        <li><a href="#sec-intro">研究动机</a></li>
+      </ul>
+    </li>
+    <li><a href="#sec-carima">CARIMA 模型与输出预测</a>
+      <ul>
+        <li><a href="#sec-diophantine">Diophantine 方程递推</a></li>
+      </ul>
+    </li>
+    <li><a href="#sec-control-law">预测控制律</a>
+      <ul>
+        <li><a href="#sec-cost">代价函数与最优控制</a></li>
+      </ul>
+    </li>
+    <li><a href="#sec-qa">思考题</a></li>
   </ol>
 </nav>
 
 <main>
 <header class="hero">
-  <div class="eyebrow">课程名称 · 章节编号</div>
-  <h1>笔记标题</h1>
-  <div class="subtitle">副标题或摘要一句话</div>
-  <div class="byline"><strong>作者：</strong>姓名 · <strong>日期：</strong>YYYY-MM-DD</div>
+  <div class="eyebrow">预测控制经典文献 · Part I §1–5</div>
+  <h1>GPC Part I §1</h1>
+  <div class="subtitle">广义预测控制（GPC）— 基本算法</div>
+  <div class="byline"><strong>原著：</strong>D. W. Clarke, C. Mohtadi, P. S. Tuffs · <strong>日期：</strong>2026-06-05</div>
   <div class="meta">
-    <span><strong>来源：</strong>课程/论文/书籍名称</span>
-    <span><strong>关键词：</strong>关键词1，关键词2</span>
+    <span><strong>来源：</strong>Automatica, Vol. 23, No. 2, pp. 137–148, 1987</span>
+    <span><strong>关键词：</strong>自适应控制，预测控制，CARIMA，Diophantine 方程，滚动优化</span>
   </div>
 </header>
 
-<h2 id="sec1"><span class="num">§1</span>第一章标题</h2>
+<!-- ===== §1 摘要与背景 ===== -->
+<h2 id="sec-abstract"><span class="num">§1</span>摘要与背景</h2>
 
-<p>正文内容。使用 <strong>重点词</strong> 高亮关键概念，行内公式 $E = mc^2$，段落公式：</p>
-
-$$\frac{\partial u}{\partial t} + u \cdot \nabla u = -\nabla p + \nu \nabla^2 u$$
+<p>GPC（Generalized Predictive Control，广义预测控制）是一族<strong>长程预测控制器</strong>的新成员，专为含有变化参数、死区时间和模型阶次的过程自适应控制而设计。</p>
 
 <div class="callout callout-info">
-  <div class="callout-title">提示</div>
-  这里放关键提示或注意事项。
+  <div class="callout-title">核心贡献</div>
+  提出了一种<strong>统一框架</strong>，可将 GMV、EPSAC、Peterka 预测控制器、Ydstie 扩展时域设计等已知算法作为其特例导出，同时对过参数化模型保持鲁棒性。
 </div>
 
-<h3>1.1 小节标题</h3>
-<p>小节内容。</p>
+<p>GPC 的关键思想是在若干步内预测受控对象输出，并对未来控制动作做假设（<strong>"控制时域"结束后控制增量为零</strong>），然后滚动优化一个加权二次代价函数。</p>
+
+<h3 id="sec-intro">1.1 研究动机：已有方法的局限</h3>
+
+<p>当时主流的自整定算法有两类，均存在短板：</p>
+
+<table>
+  <thead>
+    <tr><th>方法</th><th>优势</th><th>缺陷</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>隐式 GMV 自整定</td><td>对模型阶次假设鲁棒</td><td>死区时间变化时性能差</td></tr>
+    <tr><td>显式极点配置</td><td>可处理变死区时间</td><td>模型阶次过估计时奇异；分母阶次须精心选择</td></tr>
+  </tbody>
+</table>
+
+<p>GPC 基于显式对象参数化，能处理变死区时间；同时作为预测方法，也能应对过参数化。适用范围覆盖：</p>
+
+<ul>
+  <li>非最小相位过程（离散化后单位圆外零点）</li>
+  <li>开环不稳定或欠阻尼极点系统</li>
+  <li>未知或可变死区时间</li>
+  <li>未知阶次（过参数化时仍稳定）</li>
+</ul>
+
+<div class="callout callout-good">
+  <div class="callout-title">积分特性</div>
+  GPC 通过 CARIMA 模型自然引入积分器，消除稳态偏差，无需像多数方法那样以 ad hoc 方式附加积分环节。
+</div>
+
+<!-- ===== §2 CARIMA 模型 ===== -->
+<h2 id="sec-carima"><span class="num">§2</span>CARIMA 模型与输出预测</h2>
+
+<p>基本线性化模型（CARMA）为：</p>
+
+$$A(q^{-1})\,y(t) = B(q^{-1})\,u(t-1) + C(q^{-1})\,\xi(t) \tag{3}$$
+
+<p>工业过程中扰动多为非平稳型（随机阶跃或布朗运动），因此用差分算子 $\Delta = 1 - q^{-1}$ 替换，得到 <strong>CARIMA</strong>（Controlled Auto-Regressive Integrated Moving-Average）模型：</p>
+
+$$A(q^{-1})\,y(t) = B(q^{-1})\,u(t-1) + \frac{\xi(t)}{\Delta} \tag{5}$$
+
+<p>其中 $C(q^{-1}) = 1$ 为简化假设（Part II 讨论一般情形）。</p>
+
+<div class="callout callout-warn">
+  <div class="callout-title">符号约定</div>
+  $q^{-1}$ 为后移算子；$A, B$ 为 $q^{-1}$ 的多项式；$u(t)$ 为控制输入，$y(t)$ 为测量输出，$\xi(t)$ 为不相关随机序列。
+</div>
+
+<h3>2.1 最优 $j$ 步预测器推导</h3>
+
+<p>引入恒等式（Diophantine 方程）：</p>
+
+$$1 = E_j(q^{-1})\,A(q^{-1})\,\Delta + q^{-j}\,F_j(q^{-1}) \tag{6}$$
+
+<p>其中 $E_j$、$F_j$ 由 $A(q^{-1})$ 和预测步数 $j$ 唯一确定。将 (5) 两边乘以 $E_j \Delta q^j$ 并代入 (6)，化简得最优预测器：</p>
+
+$$\hat{y}(t+j\mid t) = G_j(q^{-1})\,\Delta u(t+j-1) + F_j(q^{-1})\,y(t) \tag{8}$$
+
+<p>其中 $G_j(q^{-1}) = E_j(q^{-1})\,B(q^{-1})$，其系数恰好是对象阶跃响应的前 $j$ 项。</p>
+
+<h3 id="sec-diophantine">2.2 Diophantine 方程的递推计算</h3>
+
+<p>直接对每个 $j$ 求解 (6) 计算量大。以下递推关系使 $E_{j+1}, F_{j+1}$ 可由 $E_j, F_j$ 廉价获得：</p>
+
+$$r_j \leftarrow f_0^{(j)} \tag{11a}$$
+$$s_i^{(j)} = f_{i+1}^{(j)} - a_{i+1}\,r_j, \quad i = 0,\ldots,\deg F_{j+1} \tag{11b}$$
+$$E_{j+1}(q^{-1}) = E_j(q^{-1}) + q^{-j}\,r_j \tag{12}$$
+$$G_{j+1} = B(q^{-1})\,E_{j+1}(q^{-1}) \tag{13}$$
+
+<p>初始值：$E_1 = 1$，$F_1 = q(1 - \hat{A})$（其中 $\hat{A} = A$ 去掉首项 1）。</p>
 
 <details class="qa">
-  <summary>Q: 思考题？</summary>
-  <p>A: 解答内容。</p>
+  <summary>Q: 为什么 $G_j$ 的系数等于阶跃响应系数？</summary>
+  <p>A: $G_j(q^{-1}) = E_j B = B(q^{-1})\,[1 - q^{-j}F_j(q^{-1})]/[A(q^{-1})\Delta]$，即对象传递函数 $B/A\Delta$ 的 Z 变换截断前 $j$ 项，恰好对应单位阶跃响应序列 $g_0, g_1, \ldots, g_{j-1}$。</p>
 </details>
 
-<h2 id="sec2"><span class="num">§2</span>第二章标题</h2>
-<p>第二章正文。</p>
+<!-- ===== §3 预测控制律 ===== -->
+<h2 id="sec-control-law"><span class="num">§3</span>预测控制律</h2>
+
+<p>将全部预测写成矩阵形式：</p>
+
+$$\hat{\mathbf{y}} = G\,\Delta\mathbf{u} + \mathbf{f} \tag{15}$$
+
+<p>其中 $G$ 为 $N \times N$ 下三角矩阵，第 $(i,j)$ 元素为阶跃响应系数 $g_{i-j}$（$i \geq j$ 时），$\mathbf{f}$ 为基于已知历史数据可完全计算的向量，$\Delta\mathbf{u} = [\Delta u(t), \ldots, \Delta u(t+N-1)]^\top$。</p>
+
+$$G = \begin{bmatrix} g_0 & 0 & \cdots & 0 \\ g_1 & g_0 & \cdots & 0 \\ \vdots & & \ddots & \vdots \\ g_{N-1} & g_{N-2} & \cdots & g_0 \end{bmatrix}$$
+
+<h3 id="sec-cost">3.1 代价函数与最优控制律</h3>
+
+<p>代价函数为：</p>
+
+$$J = \sum_{j=N_1}^{N_2} [\hat{y}(t+j) - w(t+j)]^2 + \lambda \sum_{j=1}^{N_u} [\Delta u(t+j-1)]^2 \tag{14}$$
+
+<p>其中 $N_1, N_2$ 为最小/最大预测时域，$\lambda$ 为控制权重（默认常数）。最小化 $J$ 无约束解为：</p>
+
+$$\Delta\mathbf{u} = (G^\top G + \lambda I)^{-1} G^\top (\mathbf{w} - \mathbf{f}) \tag{17}$$
+
+<p>取第一个元素实施，滚动重复（<strong>Receding Horizon</strong>）。实际控制律为：</p>
+
+$$u(t) = u(t-1) + \mathbf{c}^\top (\mathbf{w} - \mathbf{f}) \tag{18}$$
+
+<p>其中 $\mathbf{c}^\top$ 为 $(G^\top G + \lambda I)^{-1}G^\top$ 的第一行，包含积分作用，稳态误差为零。</p>
+
+<div class="callout callout-info">
+  <div class="callout-title">默认参数建议</div>
+  大量仿真表明，对一大类过程 $N_1 = 1$，$N_2 = 10$ 即可稳定控制，无需精细整定。
+</div>
+
+<!-- ===== 思考题 ===== -->
+<h2 id="sec-qa"><span class="num">§4</span>思考题</h2>
+
+<details class="qa">
+  <summary>Q: CARMA 与 CARIMA 模型的区别是什么？为什么工业场景更偏好 CARIMA？</summary>
+  <p>A: CARMA 中扰动为平稳移动平均 $C(q^{-1})\xi(t)$；CARIMA 在分母加入差分算子 $\Delta$，等价于假设扰动为非平稳积分过程（随机阶跃/布朗运动）。工业中大多数扰动是阶跃型的，CARIMA 能自然引入积分器消除稳态偏差，因此更实用。</p>
+</details>
+
+<details class="qa">
+  <summary>Q: Diophantine 方程的递推初始化条件如何推导？</summary>
+  <p>A: 对 $j=1$：$1 = E_1 A \Delta + q^{-1} F_1$。因 $A\Delta$ 的常数项为 1，令 $E_1 = 1$（0 阶多项式）；则 $q^{-1}F_1 = 1 - A\Delta$，整理得 $F_1 = q(1 - A\Delta|_{q^{-1}\text{项}})$，即 $F_1 = q(1 - \hat{A})$，其中 $\hat{A}$ 为 $A$ 去掉首项 1 后乘以 $\Delta$ 的部分。</p>
+</details>
+
+<details class="qa">
+  <summary>Q: 为什么"控制时域"内令增量为零能提升鲁棒性？</summary>
+  <p>A: 控制时域 $N_u$ 之后令 $\Delta u = 0$，相当于约束了自由度，减少了矩阵 $G$ 的列数，使 $(G^\top G + \lambda I)$ 更易求逆且条件数更好。同时避免了长时域内不确定性累积导致的激进控制动作，对死区时间或模型失配有天然抑制作用。</p>
+</details>
 
 <footer class="note-footer">
-  mynotes academic_lecture 模板 · 来源：AI-Offer/academic.html
+  mynotes academic_lecture 模板 · 来源：Clarke et al., Automatica 1987 · 生成于 2026-06-05
 </footer>
 </main>
 
@@ -395,7 +518,6 @@ $$\frac{\partial u}{\partial t} + u \cdot \nabla u = -\nabla p + \nu \nabla^2 u$
 <script>
 (function () {
   "use strict";
-  // TOC scrollspy
   var tocLinks = [].slice.call(document.querySelectorAll("nav.toc a"));
   var headings = tocLinks.map(function (a) {
     var id = a.getAttribute("href").replace(/^#/, "");
@@ -414,7 +536,6 @@ $$\frac{\partial u}{\partial t} + u \cdot \nabla u = -\nabla p + \nu \nabla^2 u$
     }, { rootMargin: "-15% 0px -75% 0px" });
     headings.forEach(function (h) { io.observe(h); });
   }
-  // Print: force details open
   var _stash = [], _printing = false;
   window.addEventListener("beforeprint", function () {
     if (_printing) return; _printing = true; _stash = [];

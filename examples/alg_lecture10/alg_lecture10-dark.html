@@ -9,7 +9,7 @@
 <meta name="generator" content="mynotes (academic_lecture, v1)">
 <meta name="mynotes:created-at" content="2026-06-04">
 <meta name="mynotes:template" content="academic_lecture">
-<meta name="mynotes:theme" content="default">
+<meta name="mynotes:theme" content="dark">
 
 <script>
 window.MathJax = {
@@ -29,40 +29,40 @@ window.MathJax = {
 <style>
 :root {
   /* ── 主色（标题、边框、active） ── */
-  --accent-dark:  #a00000;
-  --accent-mid:   #c0392b;
-  --accent-pale:  #fdecec;
+  --accent-dark:  #ff6b6b;
+  --accent-mid:   #ff8a80;
+  --accent-pale:  #3a1a1a;
 
   /* ── academic_lecture 兼容变量（来自 ARIS academic.html） ── */
-  --bg:           #fdfcf7;
-  --bg-soft:      #f4f1ea;
-  --bg-code:      #f8f5ec;
-  --ink:          #1a1a1a;
-  --ink-soft:     #4a4a4a;
-  --ink-muted:    #6b6b6b;
-  --primary:      #1a4a8c;
-  --primary-soft: #2d6cb8;
-  --accent:       #b8390e;
-  --warn:         #b45309;
-  --warn-bg:      #fef3c7;
-  --info-bg:      #dbeafe;
-  --good-bg:      #d1fae5;
-  --good:         #065f46;
-  --bad-bg:       #fee2e2;
-  --bad:          #991b1b;
-  --border:       #d6d0c0;
-  --border-soft:  #e8e3d5;
+  --bg:           #1e1e1e;
+  --bg-soft:      #252525;
+  --bg-code:      #2a2a2a;
+  --ink:          #e8e8e8;
+  --ink-soft:     #c0c0c0;
+  --ink-muted:    #888888;
+  --primary:      #4a90d9;
+  --primary-soft: #6aaae8;
+  --accent:       #ff8a80;
+  --warn:         #f0c040;
+  --warn-bg:      #2e2600;
+  --info-bg:      #0e2040;
+  --good-bg:      #0a2a1a;
+  --good:         #4caf80;
+  --bad-bg:       #2a0a0a;
+  --bad:          #ff6b6b;
+  --border:       #3a3a3a;
+  --border-soft:  #2e2e2e;
 
   /* ── minimal_slide 变量 ── */
-  --gray-bar:     #ededed;
-  --blue-pale:    #f0f6ff;
-  --green-pale:   #f0fff4;
-  --yellow-pale:  #fff8e6;
-  --text:         #1a1a1a;
-  --muted:        #666;
-  --bg-page:      #f7f7f7;
-  --bg-card:      #fff;
-  --bg-sidebar:   #fafafa;
+  --gray-bar:     #2e2e2e;
+  --blue-pale:    #0e1e30;
+  --green-pale:   #0a1e12;
+  --yellow-pale:  #1e1800;
+  --text:         #e8e8e8;
+  --muted:        #888888;
+  --bg-page:      #181818;
+  --bg-card:      #242424;
+  --bg-sidebar:   #1e1e1e;
 
   /* ── 字体 ── */
   --font-main:    "PingFang SC", "Microsoft YaHei", "Liberation Serif", serif;
@@ -72,7 +72,7 @@ window.MathJax = {
   /* ── 尺寸 ── */
   --radius:       4px;
   --radius-lg:    6px;
-  --shadow-card:  0 1px 3px rgba(0,0,0,.05);
+  --shadow-card:  0 1px 3px rgba(0,0,0,.4);
   --sidebar-w:    260px;
 }
 
@@ -116,9 +116,9 @@ nav.toc h3 {
   color: var(--ink-muted);
   font-weight: 600;
 }
-nav.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
-nav.toc ol li { margin: 5px 0; counter-increment: toc; }
-nav.toc ol li::before { content: counter(toc) ". "; color: var(--ink-muted); margin-right: 4px; }
+nav.toc > ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
+nav.toc > ol > li { margin: 5px 0; counter-increment: toc; }
+nav.toc > ol > li::before { content: counter(toc) ". "; color: var(--ink-muted); margin-right: 4px; }
 nav.toc a {
   color: var(--ink-soft);
   text-decoration: none;
