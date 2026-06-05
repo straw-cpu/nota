@@ -1,4 +1,4 @@
-# mynotes
+# nota
 
 > Turn lectures, papers, and projects into structured, browsable HTML — as a coding agent skill.
 >
