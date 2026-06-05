@@ -2,7 +2,7 @@
 
 > Turn lectures, papers, and projects into structured, browsable HTML — as a coding agent skill.
 >
-> 把课堂讲义、文献阅读、项目归纳变成结构化可浏览的 HTML 笔记 — 作为 coding agent skill 使用。
+> 📖 **中文版 (Chinese version)**: [README_CN.md](README_CN.md)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Agent skill](https://img.shields.io/badge/coding_agent-skill-7B2CBF.svg)
