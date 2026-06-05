@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZBFB Examples · mynotes</title>
+<style>
+  :root {
+    --primary: #1a4a8c;
+    --accent:  #b8390e;
+    --bg:      #fdfcf7;
+    --ink:     #1a1a1a;
+    --muted:   #6b6b6b;
+    --border:  #d4cfc4;
+    --hover:   #eef2fa;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Georgia", "Noto Serif SC", serif;
+    line-height: 1.7;
+    padding: 0 1rem 4rem;
+  }
+
+  header {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 3rem 0 1.5rem;
+    border-bottom: 2px solid var(--primary);
+  }
+  header .eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    margin-bottom: 0.5rem;
+  }
+  header h1 {
+    font-size: 1.75rem;
+    color: var(--primary);
+    font-weight: 700;
+  }
+  header .subtitle {
+    margin-top: 0.45rem;
+    color: var(--muted);
+    font-size: 0.92rem;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .card-list {
+    max-width: 780px;
+    margin: 2rem auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem 1.4rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.2rem;
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+  .card:hover {
+    box-shadow: 0 3px 14px rgba(26,74,140,0.10);
+    border-color: #9fb8e0;
+  }
+
+  .card-num {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--border);
+    line-height: 1;
+    min-width: 2rem;
+    padding-top: 0.15rem;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .card-body { flex: 1; }
+  .card-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.3rem;
+  }
+  .card-title a { color: inherit; text-decoration: none; }
+  .card-title a:hover { color: var(--accent); text-decoration: underline; }
+  .card-desc {
+    font-size: 0.88rem;
+    color: var(--muted);
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+  }
+
+  .card-link {
+    align-self: center;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.82rem;
+    color: var(--primary);
+    white-space: nowrap;
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+    padding: 0.3rem 0.75rem;
+    text-decoration: none;
+    transition: background 0.12s, color 0.12s;
+  }
+  .card-link:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  footer {
+    max-width: 780px;
+    margin: 3rem auto 0;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">ZBFB · mynotes</div>
+  <h1>Examples</h1>
+  <div class="subtitle">三份固化 HTML 成品 · 液流电池数字孪生项目展示材料</div>
+</header>
+
+<div class="card-list">
+
+  <div class="card">
+    <div class="card-num">01</div>
+    <div class="card-body">
+      <div class="card-title">
+        <a href="zbfb_lecture_set/index.html">液流电池数字孪生 · 学习笔记集</a>
+      </div>
+      <div class="card-desc">
+        全栈四层架构（Layer A 微观 / B 宏观 ROM / C EKF / D MPC）系统教案，共 9 节 HTML，含答疑与仿真改进计划。
+      </div>
+    </div>
+    <a class="card-link" href="zbfb_lecture_set/index.html">目录 →</a>
+  </div>
+
+  <div class="card">
+    <div class="card-num">02</div>
+    <div class="card-body">
+      <div class="card-title">
+        <a href="zbfb_interview_cheatsheet.html">ZBFB 面试速查手册</a>
+      </div>
+      <div class="card-desc">
+        一页式面试准备速查表：核心公式、关键参数、常见面试题与标准回答框架，适合快速复习。
+      </div>
+    </div>
+    <a class="card-link" href="zbfb_interview_cheatsheet.html">打开 →</a>
+  </div>
+
+  <div class="card">
+    <div class="card-num">03</div>
+    <div class="card-body">
+      <div class="card-title">
+        <a href="zbfb_poster_cvpr.html">ZBFB 海报 · CVPR 风格</a>
+      </div>
+      <div class="card-desc">
+        会议海报版式：项目方法、实验结果可视化与结论，采用 CVPR 学术海报排版风格。
+      </div>
+    </div>
+    <a class="card-link" href="zbfb_poster_cvpr.html">打开 →</a>
+  </div>
+
+</div>
+
+<footer>mynotes examples · ZBFB 液流电池数字孪生 · 2026-06-04</footer>
+
+</body>
+</html>

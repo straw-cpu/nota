@@ -1,0 +1,240 @@
+<!-- mynotes template: minimal_slide | source: ZBFB 液流电池笔记风格 | 适用: 轻量讲义、单文件笔记 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>笔记标题</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']], tags: 'ams' },
+  options: { skipHtmlTags: ['script','noscript','style','textarea'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+/* ── CSS 变量（来自 ZBFB 液流电池笔记 theme.css） ── */
+:root {
+  --accent-dark:  #a00000;
+  --accent-mid:   #c0392b;
+  --accent-pale:  #fdecec;
+  --gray-bar:     #ededed;
+  --blue-pale:    #f0f6ff;
+  --green-pale:   #f0fff4;
+  --yellow-pale:  #fff8e6;
+  --border:       #d4d4d4;
+  --text:         #1a1a1a;
+  --muted:        #666;
+  --bg-page:      #f7f7f7;
+  --bg-card:      #fff;
+  --font-main:    "PingFang SC", "Microsoft YaHei", "Liberation Serif", serif;
+  --font-mono:    "SFMono-Regular", Consolas, monospace;
+  --radius:       4px;
+  --shadow-card:  0 1px 3px rgba(0,0,0,.05);
+}
+
+/* ── 基础 ── */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-main);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text);
+  background: var(--bg-page);
+  margin: 0;
+  padding: 0;
+}
+
+/* ── 布局：单列居中 ── */
+.page {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 32px 24px 60px;
+}
+
+/* ── 标题头 ── */
+header.title-slide {
+  background: var(--bg-card);
+  border-bottom: 2px solid var(--accent-dark);
+  padding: 20px 24px 16px;
+  margin-bottom: 24px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+header.title-slide h1 {
+  color: var(--accent-dark);
+  font-size: 1.6em;
+  margin: 0 0 6px;
+}
+header.title-slide .subtitle { color: var(--muted); font-size: 0.95em; }
+header.title-slide .meta { color: var(--muted); font-size: 0.85em; margin-top: 8px; }
+
+/* ── 章节卡片 ── */
+.slide {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.slide-header {
+  background: var(--gray-bar);
+  border-bottom: 2px solid var(--accent-dark);
+  color: var(--accent-dark);
+  font-weight: 600;
+  font-size: 0.95em;
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.slide-header .pdf-ref { color: var(--muted); font-weight: 400; font-size: 0.85em; }
+.slide-body { padding: 16px 20px; }
+
+/* ── 标题层级 ── */
+h2 { color: var(--accent-dark); font-size: 1.1em; margin: 20px 0 8px; }
+h3 { color: var(--accent-mid); font-size: 1em; margin: 16px 0 6px; }
+
+/* ── 列表 ── */
+ul.tri { list-style: none; padding-left: 1.2em; }
+ul.tri > li::before { content: "▸ "; color: var(--accent-dark); }
+
+/* ── 标签 ── */
+.tag-core {
+  display: inline-block;
+  background: var(--accent-pale);
+  color: var(--accent-dark);
+  border-left: 3px solid var(--accent-dark);
+  padding: 2px 10px;
+  font-size: 0.88em;
+  font-weight: 600;
+  margin: 12px 0 6px;
+  border-radius: 0 2px 2px 0;
+}
+.tag-bg {
+  display: inline-block;
+  background: var(--gray-bar);
+  color: var(--muted);
+  border-left: 3px solid #bbb;
+  padding: 2px 10px;
+  font-size: 0.88em;
+  font-weight: 600;
+  margin: 12px 0 6px;
+  border-radius: 0 2px 2px 0;
+}
+
+/* ── 信息框 ── */
+.note-box {
+  background: var(--blue-pale);
+  border-left: 3px solid #5a8ac0;
+  padding: 10px 14px;
+  margin: 10px 0;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 0.92em;
+}
+.note-box .box-label { color: #3a6a9a; font-weight: 700; font-size: 0.85em; margin-bottom: 4px; }
+
+.def-box {
+  background: var(--accent-pale);
+  border: 1px solid #e8b4b4;
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin: 10px 0;
+}
+.def-box .box-label { color: var(--accent-dark); font-weight: 700; font-size: 0.85em; margin-bottom: 4px; }
+
+.ex-box {
+  background: var(--green-pale);
+  border-left: 3px solid #2a9d5c;
+  padding: 10px 14px;
+  margin: 10px 0;
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.ex-box .box-label { color: #2a7a4a; font-weight: 700; font-size: 0.85em; margin-bottom: 4px; }
+
+/* ── 表格 ── */
+table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.91em; }
+th { background: var(--accent-pale); padding: 7px 10px; border: 1px solid var(--border); text-align: left; }
+td { padding: 7px 10px; border: 1px solid var(--border); vertical-align: top; }
+
+/* ── 代码 ── */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: #f4f4f4;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  color: var(--accent-mid);
+}
+pre { background: #f8f8f8; border: 1px solid var(--border); border-left: 3px solid var(--accent-dark);
+      padding: 12px 14px; overflow-x: auto; border-radius: var(--radius); margin: 10px 0; }
+pre code { background: transparent; border: none; padding: 0; color: var(--text); font-size: 0.87em; }
+
+/* ── MathJax 保护 ── */
+mjx-container, .MathJax { text-transform: none !important; }
+
+/* ── 响应式 ── */
+@media (max-width: 600px) {
+  .page { padding: 16px 12px 40px; }
+  header.title-slide h1 { font-size: 1.3em; }
+}
+@media print {
+  body { background: white; }
+  .page { max-width: 100%; padding: 0; }
+  .slide { box-shadow: none; border: 1px solid #ccc; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="title-slide">
+  <h1>§N 笔记标题</h1>
+  <div class="subtitle">副标题 · 关键概念 · 本节重点</div>
+  <div class="meta">来源：课程/论文名称 · 日期：YYYY-MM-DD</div>
+</header>
+
+<!-- ===== 节 1 ===== -->
+<div class="slide" id="sec1">
+  <div class="slide-header">
+    <span>1. 第一节标题</span>
+    <span class="pdf-ref">参考来源 / p.X</span>
+  </div>
+  <div class="slide-body">
+    <span class="tag-core">★ 核心概念</span>
+    <p>正文内容。行内公式 $E = mc^2$，段落公式：</p>
+    $$\frac{d}{dt}\mathbf{x} = f(\mathbf{x}, \mathbf{u})$$
+    <ul class="tri">
+      <li>要点一</li>
+      <li>要点二</li>
+      <li>要点三</li>
+    </ul>
+    <div class="note-box">
+      <div class="box-label">注意</div>
+      这里放补充说明或注意事项。
+    </div>
+  </div>
+</div>
+
+<!-- ===== 节 2 ===== -->
+<div class="slide" id="sec2">
+  <div class="slide-header">
+    <span>2. 第二节标题</span>
+    <span class="pdf-ref">参考来源 / p.Y</span>
+  </div>
+  <div class="slide-body">
+    <span class="tag-bg">○ 背景说明</span>
+    <p>背景内容。</p>
+    <div class="ex-box">
+      <div class="box-label">示例</div>
+      <p>例题内容。</p>
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+/* mynotes theme: default | 灰红学术配色（来自 ZBFB 数字孪生笔记） */
+:root {
+  /* ── 主色（标题、边框、active） ── */
+  --accent-dark:  #a00000;
+  --accent-mid:   #c0392b;
+  --accent-pale:  #fdecec;
+
+  /* ── academic_lecture 兼容变量（来自 ARIS academic.html） ── */
+  --bg:           #fdfcf7;
+  --bg-soft:      #f4f1ea;
+  --bg-code:      #f8f5ec;
+  --ink:          #1a1a1a;
+  --ink-soft:     #4a4a4a;
+  --ink-muted:    #6b6b6b;
+  --primary:      #1a4a8c;
+  --primary-soft: #2d6cb8;
+  --accent:       #b8390e;
+  --warn:         #b45309;
+  --warn-bg:      #fef3c7;
+  --info-bg:      #dbeafe;
+  --good-bg:      #d1fae5;
+  --good:         #065f46;
+  --bad-bg:       #fee2e2;
+  --bad:          #991b1b;
+  --border:       #d6d0c0;
+  --border-soft:  #e8e3d5;
+
+  /* ── minimal_slide 变量 ── */
+  --gray-bar:     #ededed;
+  --blue-pale:    #f0f6ff;
+  --green-pale:   #f0fff4;
+  --yellow-pale:  #fff8e6;
+  --text:         #1a1a1a;
+  --muted:        #666;
+  --bg-page:      #f7f7f7;
+  --bg-card:      #fff;
+  --bg-sidebar:   #fafafa;
+
+  /* ── 字体 ── */
+  --font-main:    "PingFang SC", "Microsoft YaHei", "Liberation Serif", serif;
+  --font-serif:   "Source Serif Pro", "Georgia", "Songti SC", serif;
+  --font-mono:    "SFMono-Regular", "JetBrains Mono", Consolas, monospace;
+
+  /* ── 尺寸 ── */
+  --radius:       4px;
+  --radius-lg:    6px;
+  --shadow-card:  0 1px 3px rgba(0,0,0,.05);
+  --sidebar-w:    260px;
+}

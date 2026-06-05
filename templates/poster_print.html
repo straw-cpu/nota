@@ -1,0 +1,607 @@
+<!-- mynotes template: poster_print | source: posterly/portrait_2col_neutral.html | 适用: A4/A2海报打印 -->
+<!DOCTYPE html>
+<!--
+  ============================================================
+  TEMPLATE: portrait_2col_neutral
+  CANVAS:   24in × 36in PORTRAIT (ICLR / CVPR / many workshops default)
+  LAYOUT:   header → body 2 columns → footer
+            (NO framework banner, NO takeaways strip — vertical space is precious)
+  USE WHEN: venue mandates portrait orientation, sub-A0/A1 size;
+            reader scans top-to-bottom in column 1, then jumps to column 2.
+  HOW TO USE:
+    1. Copy this file to your working directory as `poster.html`.
+    2. Edit the DESIGN TOKENS in `:root` to your lab/venue colors.
+    3. Replace TODO content placeholders (search for "TODO").
+    4. Run `python tools/poster_check.py measure poster.html` to align columns.
+    5. Run `python tools/render_preview.py poster.html` to produce the PDF.
+  NOTE: as shipped, this scaffold passes `preflight` (structure) but is
+    EXPECTED to FAIL `measure`/`polish` -- figures are commented out and copy
+    is TODO stubs, so columns only fill the top of the canvas. Those two gates
+    judge a FILLED poster; balance them once you've added real content. See
+    templates/README.md ("Scaffolds, not finished posters").
+  MEASURE ROLES: every layout-critical element carries `data-measure-role`.
+  Generic measurement scripts depend on these — do not remove.
+  ============================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POSTER TITLE — Venue Year</title>
+
+<!-- MathJax v3 for inline equations. CDN by default; to go offline,
+     download a MathJax v3 release into ./mathjax/ and change the <script>
+     `src` below to "mathjax/es5/tex-svg.js". -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      packages: {'[+]': ['ams']}
+    },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+  /* =========================================================
+     CANVAS — 24" × 36" PORTRAIT
+     24in × 25.4 mm/in = 609.6 mm ≈ 610 u (width)
+     36in × 25.4 mm/in = 914.4 mm ≈ 914 u (height)
+     ========================================================= */
+  @page { size: 24in 36in; margin: 0; }
+
+  :root {
+    /* ===== DESIGN TOKENS — edit to rebrand the poster ===== */
+
+    /* Primary accent (header underline, card-highlight bar, section nums, .keyword) */
+    --accent:        #2D5F8B;
+    --accent-deep:   #1F4566;
+    --accent-light:  #E8F1F8;
+    --accent-soft:   #D7E5F0;
+
+    /* Secondary accent for "ours / best" emphasis (table .ours row, "★" callouts) */
+    --gold:          #C9A24A;
+    --gold-soft:     #FFF7E0;
+
+    /* Text */
+    --text-primary:   #1A1A1A;
+    --text-secondary: #555;
+    --text-muted:     #888;
+
+    /* Backgrounds */
+    --bg-page:        #F6F2F0;
+    --bg-card:        #FFFFFF;
+    --bg-card-tint:   #FAFAFB;
+    --bg-emphasis:    var(--accent-light);
+
+    /* Borders */
+    --border-soft:    #D8D8D8;
+    --border-strong:  var(--accent);
+
+    /* Base unit. Print: 1mm; screen preview: 1.6px (~3.78px = 1mm at 96dpi). */
+    --u: 1.6px;
+
+    /* Fonts. Override at :root if your venue mandates a specific family. */
+    --font-serif: "Charter", "Source Serif Pro", "Georgia", serif;
+    --font-sans:  "Inter", "Helvetica Neue", sans-serif;
+  }
+
+  /* =========================================================
+     RESET + BASE
+     ========================================================= */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: #2b2b2b;
+    font-family: var(--font-serif);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .poster {
+    width: calc(610 * var(--u));
+    height: calc(914 * var(--u));
+    background: var(--bg-page);
+    background-image:
+      radial-gradient(ellipse at top left,    rgba(45, 95, 139, 0.06), transparent 40%),
+      radial-gradient(ellipse at bottom right, rgba(201, 162, 74, 0.05), transparent 50%);
+    margin: 20px auto;
+    padding: calc(10 * var(--u)) calc(12 * var(--u));
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: calc(6 * var(--u));
+    box-shadow: 0 0 60px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .poster::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0;
+    height: calc(8 * var(--u));
+    background: linear-gradient(90deg,
+      var(--accent-deep) 0%,
+      var(--accent)      40%,
+      var(--accent)      70%,
+      var(--gold)        100%);
+  }
+
+  /* =========================================================
+     HEADER
+     ========================================================= */
+  .header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: calc(14 * var(--u));
+    padding: calc(1 * var(--u)) calc(3 * var(--u)) calc(4 * var(--u));
+    border-bottom: calc(2 * var(--u)) solid var(--accent);
+  }
+
+  .venue-badge {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-width: calc(80 * var(--u));
+    text-align: center;
+    border-right: calc(1 * var(--u)) solid var(--border-soft);
+    padding-right: calc(10 * var(--u));
+  }
+  .venue-badge .vb-venue {
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-size: calc(28 * var(--u));
+    color: var(--accent-deep);
+    line-height: 1;
+    letter-spacing: -0.5px;
+  }
+  .venue-badge .vb-year {
+    font-family: var(--font-sans);
+    font-size: calc(12 * var(--u));
+    color: var(--text-secondary);
+    margin-top: calc(3 * var(--u));
+    letter-spacing: 1.2px;
+  }
+  .venue-badge .vb-tag {
+    font-family: var(--font-sans);
+    font-size: calc(10 * var(--u));
+    color: var(--accent);
+    font-weight: 700;
+    margin-top: calc(2 * var(--u));
+    letter-spacing: 1.2px;
+  }
+
+  .title-block { text-align: center; min-width: 0; }
+  .title {
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-size: calc(28 * var(--u));
+    line-height: 1.05;
+    color: var(--accent-deep);
+    letter-spacing: -0.5px;
+  }
+  .title .accent { color: var(--gold); }
+  .subtitle {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: calc(14 * var(--u));
+    color: var(--text-secondary);
+    margin-top: calc(2 * var(--u));
+    font-style: italic;
+  }
+  .authors-line {
+    font-family: var(--font-sans);
+    font-size: calc(13 * var(--u));
+    color: var(--accent);
+    font-weight: 600;
+    margin-top: calc(3 * var(--u));
+  }
+  .authors-line .author { margin: 0 calc(4 * var(--u)); }
+  .authors-line sup { font-size: 0.7em; color: var(--accent); }
+  .authors-line .aff {
+    color: var(--text-secondary);
+    font-weight: 400;
+    display: block;
+    margin-top: calc(2 * var(--u));
+    font-size: calc(11 * var(--u));
+  }
+
+  .right-block {
+    display: flex; align-items: center;
+    gap: calc(8 * var(--u));
+  }
+  .qr-block { display: flex; flex-direction: column; align-items: center; gap: calc(2 * var(--u)); }
+  .qr-block img {
+    width: calc(75 * var(--u));
+    height: calc(75 * var(--u));
+    border: calc(2 * var(--u)) solid var(--accent);
+    border-radius: calc(4 * var(--u));
+    background: white;
+    padding: calc(2 * var(--u));
+  }
+  .qr-label {
+    font-family: var(--font-sans);
+    font-size: calc(10 * var(--u));
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .logo-slot img { height: calc(75 * var(--u)); width: auto; display: block; }
+
+  /* =========================================================
+     BODY: 2 columns
+     ========================================================= */
+  .body-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: calc(12 * var(--u));
+    min-height: 0;
+  }
+  .column {
+    display: flex; flex-direction: column;
+    gap: calc(7 * var(--u));
+    min-height: 0;
+    height: 100%;
+    padding-bottom: calc(4 * var(--u));
+  }
+
+  /* =========================================================
+     CARDS
+     ========================================================= */
+  .card {
+    background: var(--bg-card);
+    border-radius: calc(5 * var(--u));
+    padding: calc(5 * var(--u)) calc(10 * var(--u));
+    border: calc(1 * var(--u)) solid var(--border-soft);
+    box-shadow: 0 calc(2 * var(--u)) calc(6 * var(--u)) rgba(45, 95, 139, 0.05);
+    position: relative;
+  }
+  .card.tinted    { background: var(--bg-card-tint); }
+  .card.highlight {
+    border-left: calc(6 * var(--u)) solid var(--accent);
+    background: linear-gradient(90deg, var(--bg-emphasis) 0%, var(--bg-card) 30%);
+  }
+
+  .section-title {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: calc(17 * var(--u));
+    color: var(--accent-deep);
+    margin-bottom: calc(3 * var(--u));
+    display: flex; align-items: center;
+    gap: calc(5 * var(--u));
+    flex-wrap: wrap;
+  }
+  .section-title .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: calc(24 * var(--u)); height: calc(24 * var(--u));
+    background: var(--accent); color: white;
+    border-radius: 50%;
+    font-size: calc(14 * var(--u)); font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .body-text, .card p, .card li {
+    font-family: var(--font-serif);
+    font-size: calc(13 * var(--u));
+    line-height: 1.35;
+    color: var(--text-primary);
+  }
+  .card ul, .card ol { padding-left: calc(20 * var(--u)); }
+  .card li { margin-bottom: calc(2 * var(--u)); }
+
+  .keyword       { color: var(--accent); font-weight: 700; }
+  .keyword-gold  { color: var(--gold);   font-weight: 700; }
+  .highlight-text {
+    background: var(--bg-emphasis);
+    padding: 0 calc(3 * var(--u));
+    border-radius: calc(2 * var(--u));
+  }
+
+  .eqn {
+    background: var(--bg-emphasis);
+    border-left: calc(3 * var(--u)) solid var(--accent);
+    padding: calc(4 * var(--u)) calc(10 * var(--u));
+    margin: calc(4 * var(--u)) 0;
+    font-size: calc(14 * var(--u));
+    overflow-x: hidden;
+  }
+  .eqn .label {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: calc(10 * var(--u));
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: calc(2 * var(--u));
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .callout {
+    background: var(--accent);
+    color: white;
+    padding: calc(5 * var(--u)) calc(10 * var(--u));
+    border-radius: calc(4 * var(--u));
+    font-size: calc(13 * var(--u));
+    margin: calc(4 * var(--u)) 0;
+  }
+  .callout strong { color: var(--gold); }
+  .callout.gold {
+    background: linear-gradient(135deg, var(--gold) 0%, #B58A38 100%);
+    color: var(--accent-deep);
+  }
+  .callout.gold strong { color: var(--accent-deep); }
+
+  .figure { margin: calc(4 * var(--u)) 0; text-align: center; }
+  .figure img {
+    width: 100%;
+    border-radius: calc(4 * var(--u));
+    border: calc(1 * var(--u)) solid var(--border-soft);
+    background: white;
+  }
+  .figure .caption {
+    font-family: var(--font-sans);
+    font-size: calc(11 * var(--u));
+    color: var(--text-secondary);
+    margin-top: calc(3 * var(--u));
+    line-height: 1.3;
+    text-align: left;
+  }
+  .figure .caption strong { color: var(--accent-deep); }
+
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-sans);
+    font-size: calc(12 * var(--u));
+    margin-top: calc(3 * var(--u));
+  }
+  .result-table th, .result-table td {
+    padding: calc(2 * var(--u)) calc(4 * var(--u));
+    text-align: center;
+    border-bottom: calc(1 * var(--u)) solid var(--border-soft);
+  }
+  .result-table thead th {
+    background: var(--accent); color: white;
+    font-weight: 600; font-size: calc(11 * var(--u));
+  }
+  .result-table tbody tr.group-row td {
+    background: var(--bg-emphasis); font-weight: 700;
+    text-align: left;
+    color: var(--accent-deep);
+    padding-left: calc(8 * var(--u));
+    border-bottom: calc(2 * var(--u)) solid var(--accent);
+  }
+  .result-table tbody tr.ours td { background: var(--gold-soft); font-weight: 700; }
+  .result-table tbody tr.ours td:first-child { color: var(--accent-deep); }
+  .result-table .method { text-align: left; padding-left: calc(8 * var(--u)); }
+  .result-table .best { color: var(--accent); font-weight: 700; }
+
+  .keybox {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: calc(4 * var(--u));
+    margin: calc(4 * var(--u)) 0 0;
+  }
+  .keybox .kb-item {
+    background: var(--bg-emphasis);
+    border-top: calc(2 * var(--u)) solid var(--accent);
+    padding: calc(3 * var(--u));
+    text-align: center;
+    border-radius: 0 0 calc(3 * var(--u)) calc(3 * var(--u));
+  }
+  .kb-item .kb-num {
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-size: calc(16 * var(--u));
+    color: var(--accent);
+    line-height: 1;
+  }
+  .kb-item .kb-label {
+    font-family: var(--font-sans);
+    font-size: calc(10 * var(--u));
+    color: var(--text-secondary);
+    margin-top: calc(2 * var(--u));
+    line-height: 1.15;
+  }
+
+  /* =========================================================
+     FOOTER
+     ========================================================= */
+  .footer {
+    grid-column: 1 / -1;
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: calc(8 * var(--u));
+    border-top: calc(1 * var(--u)) solid var(--border-soft);
+    font-family: var(--font-sans);
+    font-size: calc(12 * var(--u));
+    color: var(--text-muted);
+  }
+  .footer .repo { color: var(--accent); font-weight: 600; }
+
+  .ornament {
+    position: absolute;
+    right: calc(18 * var(--u));
+    bottom: calc(18 * var(--u));
+    font-family: var(--font-sans);
+    font-size: calc(36 * var(--u));
+    color: rgba(45, 95, 139, 0.06);
+    font-weight: 900;
+    letter-spacing: 4px;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  @media print {
+    html, body { background: white; }
+    .poster { margin: 0; box-shadow: none; width: 24in; height: 36in; page-break-after: avoid; }
+    :root { --u: 1mm; }
+  }
+</style>
+</head>
+<body>
+
+<div class="poster" data-measure-role="poster">
+
+  <!-- =========================== HEADER =========================== -->
+  <header class="header" data-measure-role="header">
+    <div class="venue-badge">
+      <div class="vb-venue">VENUE</div>
+      <div class="vb-year">YEAR</div>
+      <div class="vb-tag">POSTER</div>
+    </div>
+
+    <div class="title-block">
+      <h1 class="title">POSTER TITLE: <span class="accent">Subtitle Keyword</span></h1>
+      <div class="subtitle">One-sentence tagline that explains the work in plain English.</div>
+      <div class="authors-line">
+        <span class="author">Author One</span> &middot;
+        <span class="author">Author Two</span> &middot;
+        <span class="author">Author Three<sup>&#9993;</sup></span>
+        <span class="aff">Lab / Department &middot; Institution &middot; City, Country</span>
+      </div>
+    </div>
+
+    <div class="right-block">
+      <div class="logo-slot">
+        <!-- Affiliation / lab logo goes here:
+             <img src="images/lab-logo.png" alt="Lab">
+             No logo? Delete this entire <div class="logo-slot"> instead of
+             leaving it empty. -->
+      </div>
+      <div class="qr-block">
+        <!-- TODO: replace with your real QR code. -->
+        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23fff'/><g fill='%23222'><rect x='4' y='4' width='26' height='26'/><rect x='70' y='4' width='26' height='26'/><rect x='4' y='70' width='26' height='26'/></g><g fill='%23fff'><rect x='10' y='10' width='14' height='14'/><rect x='76' y='10' width='14' height='14'/><rect x='10' y='76' width='14' height='14'/></g><g fill='%23222'><rect x='14' y='14' width='6' height='6'/><rect x='80' y='14' width='6' height='6'/><rect x='14' y='80' width='6' height='6'/></g><text x='50' y='54' text-anchor='middle' font-family='sans-serif' font-size='6' font-weight='bold' fill='%23888'>QR</text></svg>" alt="QR placeholder">
+        <div class="qr-label">Paper &amp; Code</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================ BODY ============================ -->
+  <div class="body-grid" data-measure-role="body">
+
+    <!-- ============ COLUMN 1 ============ -->
+    <div class="column" data-measure-role="column">
+
+      <div class="card highlight" data-measure-role="card">
+        <div class="section-title"><span class="num">1</span> Motivation</div>
+        <p class="body-text">
+          TODO: 2-3 sentences on the problem. Use <span class="keyword">accent color</span>
+          for terms you want the eye to land on.
+        </p>
+        <div class="callout" style="margin-top: calc(4 * var(--u))">
+          <strong>Q:</strong> TODO: the question your paper answers.
+        </div>
+      </div>
+
+      <div class="card" data-measure-role="card">
+        <div class="section-title"><span class="num">2</span> Key Insight</div>
+        <p class="body-text">TODO: 2-3 sentences on the central insight.</p>
+        <div class="figure" style="margin-top: calc(3 * var(--u))">
+          <!-- <img src="images/key-figure.png" alt="Key insight"> -->
+          <div class="caption">TODO: caption explaining panels.</div>
+        </div>
+      </div>
+
+      <div class="card" data-measure-role="card">
+        <div class="section-title"><span class="num">3</span> Method Step 1</div>
+        <p class="body-text">TODO: how step 1 works in 1-2 sentences.</p>
+        <div class="eqn">
+          <span class="label">Core equation</span>
+          $$f(x) \;=\; \text{TODO}$$
+        </div>
+      </div>
+
+      <div class="card highlight" data-measure-role="card">
+        <div class="section-title">
+          <span class="num">4</span> Method Step 2
+          <span style="color:var(--gold); font-size: calc(12 * var(--u))">&#9733; KEY</span>
+        </div>
+        <p class="body-text">TODO: how step 2 works.</p>
+        <div class="callout gold">
+          <strong>Theorem.</strong> TODO: one-sentence statement.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============ COLUMN 2 ============ -->
+    <div class="column" data-measure-role="column">
+
+      <div class="card highlight" data-measure-role="card">
+        <div class="section-title">
+          <span class="num">6</span> Main Result
+          <span style="color:var(--gold); font-size: calc(11 * var(--u))">&#9733; Headline</span>
+        </div>
+        <div class="figure">
+          <!-- <img src="images/main-result.png" alt="Main result"> -->
+          <div class="caption"><strong>Left:</strong> TODO. <strong>Right:</strong> TODO.</div>
+        </div>
+      </div>
+
+      <div class="card" data-measure-role="card">
+        <div class="section-title"><span class="num">7</span> Benchmark Table</div>
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th class="method" style="text-align:left">Method</th>
+              <th>Metric A &#8593;</th>
+              <th>Metric B &#8593;</th>
+              <th>Cost &#8595;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="method">Baseline 1</td><td>x.xx</td><td>x.xx</td><td>x.xx</td></tr>
+            <tr><td class="method">Baseline 2</td><td>x.xx</td><td>x.xx</td><td>x.xx</td></tr>
+            <tr class="ours"><td class="method">Ours</td><td class="best">x.xx</td><td class="best">x.xx</td><td class="best">x.xx</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" data-measure-role="card">
+        <div class="section-title"><span class="num">8</span> Ablation / Robustness</div>
+        <ul style="margin-top: calc(3 * var(--u))">
+          <li><strong>Setting A</strong> — TODO.</li>
+          <li><strong>Setting B</strong> — TODO.</li>
+          <li><strong>Setting C</strong> — TODO.</li>
+        </ul>
+      </div>
+
+      <div class="card highlight" data-measure-role="card">
+        <div class="section-title">
+          <span class="num">9</span> Takeaways
+          <span style="color:var(--gold); font-size: calc(11 * var(--u))">&#9733;</span>
+        </div>
+        <ul>
+          <li><strong>Idea.</strong> TODO: 1-line.</li>
+          <li><strong>Method.</strong> TODO: 1-line.</li>
+          <li><strong>Result.</strong> TODO: 1-line.</li>
+          <li><strong>Practical.</strong> TODO: 1-line.</li>
+        </ul>
+        <div class="callout gold" style="margin-top: calc(3 * var(--u))">
+          <strong>In one sentence:</strong> TODO — the elevator pitch.
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ============================ FOOTER ============================ -->
+  <div class="footer" data-measure-role="footer">
+    <div>
+      <strong style="color:var(--accent-deep)">METHOD NAME</strong> &middot; Venue Year &middot;
+      Acknowledgements: TODO.
+    </div>
+    <div>
+      Code: <span class="repo">github.com/&lt;org&gt;/&lt;repo&gt;</span> &nbsp;&middot;&nbsp;
+      Contact: <span class="repo">presenter@example.com</span>
+    </div>
+  </div>
+
+  <div class="ornament">LAB &middot; INSTITUTION</div>
+
+</div>
+
+</body>
+</html>
