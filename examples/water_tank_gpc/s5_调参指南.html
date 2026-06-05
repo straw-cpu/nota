@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="mynotes:template" content="minimal_slide">
+<meta name="mynotes:theme" content="default">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>§5 调参指南 · 水箱 GPC 实验</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']], tags: 'ams' },
+  options: { skipHtmlTags: ['script','noscript','style','textarea'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+/* =============================================================
+ *  theme.css  —  主题层：只管"视觉"（颜色、字体、圆角、阴影）
+ *  切换风格时只动这个文件；布局/交互在 layout.css，不改。
+ *  后续要做"蓝色学术风""暗色风""极简风"只需复制本文件改变量+框样式。
+ * ============================================================= */
+
+:root {
+  /* ── 色板 ── */
+  --accent-dark:  #a00000;   /* 主色（标题、边框、active） */
+  --accent-mid:   #c0392b;   /* 悬停、公式链接 */
+  --accent-pale:  #fdecec;   /* 定义框底色 */
+  --gray-bar:     #ededed;   /* slide header 灰条 */
+  --blue-pale:    #f0f6ff;   /* 备注框 */
+  --green-pale:   #f0fff4;   /* 例题框 */
+  --yellow-pale:  #fff8e6;   /* 思考题框 */
+
+  --border:       #d4d4d4;
+  --text:         #1a1a1a;
+  --muted:        #666;
+
+  --bg-page:      #f7f7f7;
+  --bg-card:      #fff;
+  --bg-sidebar:   #fafafa;
+
+  /* ── 字体 ── */
+  --font-main:    "PingFang SC", "Microsoft YaHei", "Liberation Serif", serif;
+  --font-mono:    "SFMono-Regular", Consolas, monospace;
+
+  /* ── 尺寸 ── */
+  --radius:       4px;
+  --radius-lg:    6px;
+  --shadow-card:  0 1px 3px rgba(0,0,0,.05);
+  --sidebar-w:    260px;
+}
+
+/* ── 顶部标题 slide ── */
+header.title-slide {
+  background: var(--bg-card);
+  border-bottom: 2px solid var(--accent-dark);
+}
+header.title-slide h1 { color: var(--accent-dark); }
+
+/* ── slide 卡片 ── */
+.slide {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+.slide-header {
+  background: var(--gray-bar);
+  border-bottom: 2px solid var(--accent-dark);
+  color: var(--accent-dark);
+}
+
+/* ── 要点列表三角 ── */
+ul.tri > li::before { color: var(--accent-dark); }
+
+/* ── 定义框（粉红） ── */
+.def-box {
+  background: var(--accent-pale);
+  border: 1px solid #e8b4b4;
+  border-radius: var(--radius);
+}
+.def-box .box-label { color: var(--accent-dark); }
+
+/* ── 备注框（浅蓝） ── */
+.note-box {
+  background: var(--blue-pale);
+  border-left: 3px solid #5a8ac0;
+}
+.note-box .box-label { color: #3a6a9a; }
+
+/* ── 例题框（浅绿） ── */
+.ex-box {
+  background: var(--green-pale);
+  border-left: 3px solid #2a9d5c;
+}
+.ex-box .box-label { color: #2a7a4a; }
+
+/* ── 思考题框（浅黄） ── */
+.ask-box {
+  background: var(--yellow-pale);
+  border-left: 3px solid #d97706;
+}
+.ask-box .box-label { color: #b8600a; }
+
+/* ── 公式链接（MathJax） ── */
+mjx-container a[href^="#mjx-eqn"],
+mjx-container a[href^="#mjx-eqn"]:visited {
+  color: var(--accent-mid);
+  text-decoration: none;
+}
+mjx-container a[href^="#mjx-eqn"]:hover { text-decoration: underline; }
+
+/* ── 侧边栏主题色 ── */
+aside.sidebar { background: var(--bg-sidebar); }
+aside.sidebar .sb-title { color: var(--accent-dark); }
+aside.sidebar a.active {
+  background: var(--accent-pale);
+  border-left-color: var(--accent-dark);
+  color: var(--accent-dark);
+}
+aside.sidebar a:hover { color: var(--accent-dark); }
+
+/* ── 节间导航按钮 ── */
+nav.section-nav a:hover {
+  color: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+/* ── 折叠按钮 ── */
+button.sidebar-toggle:hover {
+  background: var(--accent-pale);
+  color: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+/* =============================================================
+ *  layout.css  —  布局层：只管"骨架"（间距、位置、字号、打印）
+ *  所有颜色/主题相关样式在 theme.css。切主题时这里不动。
+ * ============================================================= */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-main);
+  background: var(--bg-page);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.75;
+}
+html { scroll-behavior: smooth; }
+mjx-container[display="true"] { scroll-margin-top: 70px; }
+
+/* ══════════ 侧边栏 ══════════ */
+aside.sidebar {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: var(--sidebar-w);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 18px 14px 24px;
+  font-size: 12.5px;
+  z-index: 100;
+  transition: transform 0.25s ease;
+}
+aside.sidebar.collapsed {
+  transform: translateX(calc(-1 * var(--sidebar-w)));
+}
+aside.sidebar .sb-title {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 8px 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+  padding-right: 32px;             /* 给右上角关闭按钮留位 */
+}
+aside.sidebar .sb-home {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 2px 8px 8px;
+}
+aside.sidebar ul { list-style: none; padding: 0; }
+aside.sidebar li { margin: 0; }
+aside.sidebar a {
+  display: block;
+  padding: 5px 10px;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 3px;
+  border-left: 2px solid transparent;
+  line-height: 1.5;
+}
+aside.sidebar a:hover { background: var(--bg-card); }
+aside.sidebar a.active { font-weight: 600; }
+aside.sidebar .sb-group {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 10px 10px 4px;
+  letter-spacing: 0.5px;
+}
+aside.sidebar ul.sub { padding-left: 14px; margin: 2px 0 4px; }
+aside.sidebar ul.sub a {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 2px 8px;
+}
+
+/* ══════════ 折叠按钮 ══════════ */
+button.sidebar-toggle {
+  position: fixed;
+  top: 14px;
+  z-index: 200;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--muted);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 14px;
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: left 0.25s ease, right 0.25s ease;
+  padding: 0;
+  line-height: 1;
+}
+/* 侧边栏展开：按钮贴在侧边栏右上角内 */
+button.sidebar-toggle {
+  left: calc(var(--sidebar-w) - 36px);
+}
+/* 侧边栏收起：按钮贴到页面左上角 */
+body.sidebar-hidden button.sidebar-toggle {
+  left: 14px;
+}
+
+/* ══════════ 主体 ══════════ */
+main.with-sidebar {
+  margin-left: var(--sidebar-w);
+  max-width: 880px;
+  padding: 28px 24px 60px 34px;
+  transition: margin-left 0.25s ease;
+}
+body.sidebar-hidden main.with-sidebar {
+  margin-left: 0;
+  max-width: 1000px;
+  margin-right: auto;
+  padding-left: 60px;              /* 为按钮腾点空间 */
+}
+
+/* ══════════ 窄屏 ══════════ */
+@media (max-width: 900px) {
+  aside.sidebar {
+    position: fixed;
+    width: 80vw;
+    max-width: 300px;
+    box-shadow: 2px 0 12px rgba(0,0,0,.1);
+  }
+  main.with-sidebar { margin-left: 0; padding: 20px; }
+  body:not(.sidebar-hidden) button.sidebar-toggle { left: calc(80vw - 36px); }
+  /* 窄屏默认收起 */
+  aside.sidebar:not(.forced-open) { transform: translateX(-100%); }
+  body.sidebar-hidden aside.sidebar { transform: translateX(-100%); }
+}
+
+/* ══════════ 标题 slide ══════════ */
+header.title-slide {
+  padding: 36px 40px 26px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+header.title-slide h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+header.title-slide .subtitle {
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+header.title-slide .meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ══════════ Slide 卡片 ══════════ */
+.slide {
+  margin-bottom: 22px;
+  overflow: hidden;
+}
+.slide-header {
+  padding: 10px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.slide-header .pdf-ref {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+.slide-body { padding: 18px 28px 22px; }
+.slide-body > * + * { margin-top: 10px; }
+
+/* ══════════ 三角要点 ══════════ */
+ul.tri { list-style: none; padding-left: 4px; }
+ul.tri > li { position: relative; padding-left: 22px; margin-bottom: 6px; }
+ul.tri > li::before {
+  content: "▸";
+  position: absolute; left: 2px; top: 0;
+  font-size: 13px;
+}
+ul.tri ul.dash { list-style: none; padding-left: 10px; margin-top: 4px; }
+ul.tri ul.dash > li {
+  position: relative; padding-left: 14px;
+  color: var(--muted); font-size: 13.5px;
+}
+ul.tri ul.dash > li::before { content: "–"; position: absolute; left: 0; }
+
+/* ══════════ 定义/备注/例题/思考 框（布局共性） ══════════ */
+.def-box  { padding: 14px 18px; margin: 10px 0; }
+.note-box { padding: 10px 14px; font-size: 13.5px; border-radius: 0 var(--radius) var(--radius) 0; }
+.ex-box   { padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0; }
+.ask-box  { padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0; }
+.def-box .box-label,
+.note-box .box-label,
+.ex-box .box-label,
+.ask-box .box-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+.def-box .box-label { letter-spacing: 0.6px; margin-bottom: 6px; }
+
+/* ══════════ 公式居中 ══════════ */
+.formula { text-align: center; padding: 6px 0; overflow-x: auto; }
+
+/* ══════════ 推导折叠 ══════════ */
+details.derive {
+  background: #fafafa;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-top: 10px;
+}
+details.derive summary {
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-weight: 600;
+  user-select: none;
+}
+details.derive .derive-body { padding: 8px 16px 14px; font-size: 13.5px; }
+
+/* ══════════ 节间导航 ══════════ */
+nav.section-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+nav.section-nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+}
+nav.section-nav a.disabled { color: #ccc; pointer-events: none; background: #f5f5f5; }
+
+/* ══════════ 页脚 ══════════ */
+footer.page-end {
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 30px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+/* ══════════ 打印 ══════════ */
+@media print {
+  @page { size: 13.333in 7.5in; margin: 0.5in 0.55in 0.55in; }
+  html, body { background: #fff !important; font-size: 15.5px; line-height: 1.85; }
+  aside.sidebar, button.sidebar-toggle { display: none; }
+  main.with-sidebar { margin-left: 0; max-width: none; padding: 0; }
+  header.title-slide, .slide {
+    page-break-before: always; break-before: page;
+  }
+  header.title-slide:first-child { page-break-before: auto; break-before: auto; }
+  .slide-header { page-break-after: avoid; break-after: avoid-page; }
+  .def-box, .note-box, .ex-box, .ask-box, .formula { page-break-inside: avoid; break-inside: avoid-page; }
+  .slide { border: 1px solid #999; box-shadow: none; margin: 0; }
+  .slide-header {
+    background: #ededed !important; font-size: 20px; padding: 14px 28px;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .def-box, .note-box, .ex-box, .ask-box, .slide-header {
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  nav.section-nav { display: none; }
+}
+
+/* ══════════ 三档详细程度折叠 ══════════
+ *  ★ 核心  → def-box（红框，完整展示）
+ *  ▷ 推导  → details.derive（灰色折叠，默认收起）
+ *  ○ 背景  → .bg-note（浅灰文字，无框）
+ * ============================================ */
+
+/* 推导折叠：已在上方定义 details.derive，此处补充三档标记 */
+details.derive[open] > summary { color: var(--accent-dark); }
+details.derive summary::marker { content: ""; }
+details.derive summary::-webkit-details-marker { display: none; }
+
+/* 背景说明（○ 档） */
+.bg-note {
+  font-size: 13px;
+  color: var(--muted);
+  padding: 4px 0 4px 14px;
+  border-left: 2px solid var(--border);
+  margin: 6px 0;
+}
+
+/* 难度标签 */
+.tag-core  { display:inline-block; font-size:10px; font-weight:700; padding:1px 6px; border-radius:3px; background:var(--accent-pale); color:var(--accent-dark); margin-right:6px; vertical-align:middle; }
+.tag-deriv { display:inline-block; font-size:10px; font-weight:700; padding:1px 6px; border-radius:3px; background:#f5f5f5; color:#666; margin-right:6px; vertical-align:middle; }
+.tag-bg    { display:inline-block; font-size:10px; font-weight:700; padding:1px 6px; border-radius:3px; background:#f0f6ff; color:#3a6ea5; margin-right:6px; vertical-align:middle; }
+
+/* ▷ 推导折叠块内容区 */
+details.derive summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: #888;
+  padding: 6px 0;
+  user-select: none;
+  list-style: none;
+}
+details.derive summary:hover { color: var(--accent-dark); }
+details.derive .derive-body {
+  padding: 12px 16px;
+  background: #f8f8f8;
+  border-left: 3px solid #d0d0d0;
+  border-radius: 0 4px 4px 0;
+  font-size: 13px;
+  line-height: 1.8;
+  margin-top: 4px;
+}
+details.derive .derive-body p { margin: 6px 0; }
+
+/* nav 禁用态 */
+nav.section-nav a.disabled {
+  color: var(--muted);
+  pointer-events: none;
+  cursor: default;
+  border-color: transparent;
+}
+
+/* GPC 推导步骤小标题 */
+h2.step {
+  font-size: 13px;
+  color: var(--accent-dark);
+  margin: 14px 0 8px;
+  font-weight: 700;
+}
+
+/* pre 窄屏防溢出 */
+.slide-body pre { overflow-x: auto; white-space: pre; }
+
+/* ══════════ 公式交叉超链接 ══════════ */
+a.eq-ref {
+  color: var(--accent-mid);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px dashed var(--accent-mid);
+  font-size: 0.95em;
+}
+a.eq-ref:hover { color: var(--accent-dark); border-bottom-style: solid; }
+
+/* 公式锚点高亮（被跳转时） */
+.formula:target, mjx-container:target {
+  background: #fff8e6;
+  border-radius: 4px;
+  outline: 2px solid #f0c040;
+  outline-offset: 4px;
+}
+
+/* ══════════ 表格 ══════════ */
+table.note-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 10px 0;
+}
+table.note-table th {
+  background: var(--accent-pale);
+  border: 1px solid var(--border);
+  padding: 7px 12px;
+  text-align: left;
+  font-weight: 700;
+}
+table.note-table td {
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  vertical-align: top;
+}
+table.note-table tr:nth-child(even) td { background: #fafafa; }
+
+mjx-container, .MathJax { text-transform: none !important; }
+</style>
+</head>
+<body>
+<button class="sidebar-toggle" type="button" aria-label="切换目录">×</button>
+<aside class="sidebar">
+  <div class="sb-title">水箱 GPC 实验笔记</div>
+  <a class="sb-home" href="index.html">▣ 返回总目录</a>
+  <div class="sb-group">§5 调参指南（当前）</div>
+  <ul>
+    <li><a href="#s1">1. 参数总览</a></li>
+    <li><a href="#s2">2. 推荐调参顺序</a></li>
+    <li><a href="#s3">3. 第一步：确认稳态</a></li>
+    <li><a href="#s4">4. 第二步：调响应速度</a></li>
+    <li><a href="#s5">5. 第三步：压超调</a></li>
+    <li><a href="#s6">6. 第四步：平滑控制量</a></li>
+    <li><a href="#s7">7. 常见故障诊断</a></li>
+  </ul>
+  <div class="sb-group">其他章节</div>
+  <ul>
+    <li><a href="s1_系统辨识.html">§1 系统辨识</a></li>
+    <li><a href="s2_CARIMA与丢番图.html">§2 CARIMA 与丢番图</a></li>
+    <li><a href="s3_GPC控制律.html">§3 GPC 控制律</a></li>
+    <li><a href="s4_RLS在线辨识.html">§4 RLS 在线辨识</a></li>
+  </ul>
+</aside>
+<main class="with-sidebar">
+<header class="title-slide">
+  <h1>§5 &nbsp;调参指南</h1>
+  <div class="subtitle">参数总览 · 推荐调参顺序 · 故障诊断</div>
+  <div class="meta">水箱液位控制实验 · 推荐初始值：p=40, pu=5, β=0.7, λ=2, α=0.9, λ_RLS=0.995</div>
+</header>
+
+<div class="slide" id="s1">
+  <div class="slide-header"><span>1. 参数总览</span></div>
+  <div class="slide-body">
+    <table class="note-table">
+      <tr><th>参数</th><th>含义</th><th>推荐初始值</th><th>调节方向</th></tr>
+      <tr><td>$p$</td><td>预测时域</td><td>40</td><td>一般不动；系统不稳定时可增大</td></tr>
+      <tr><td>$p_u$</td><td>控制时域</td><td>5</td><td>一般不动</td></tr>
+      <tr><td>$\beta$</td><td>阶梯衰减因子</td><td>0.7</td><td>0.5~0.9；越小控制越激进</td></tr>
+      <tr><td>$\lambda$</td><td>控制增量权重</td><td>2</td><td>控制量振荡→增大；响应太慢→减小</td></tr>
+      <tr><td>$\alpha$</td><td>柔化因子</td><td>0.9</td><td>超调大→增大（0.9~0.95）；响应慢→减小</td></tr>
+      <tr><td>$\lambda_\text{RLS}$</td><td>RLS 遗忘因子</td><td>0.995</td><td>参数漂移→增大；跟踪慢→减小</td></tr>
+      <tr><td>$\Delta u_\text{max}$</td><td>增量限幅</td><td>0.1（归一化）</td><td>控制冲击大→减小</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide" id="s2">
+  <div class="slide-header"><span>2. 推荐调参顺序</span></div>
+  <div class="slide-body">
+    <span class="tag-core">★ 核心</span>
+    <p>按以下顺序调，每步只动一个参数，观察效果后再进行下一步：</p>
+    <ol>
+      <li><b>确认稳态</b>：SP 不变，观察 $y$ 是否稳定在 SP 附近（无静差）</li>
+      <li><b>调响应速度</b>：给一个小阶跃（如 1V→1.5V），观察上升时间。调 $\lambda$</li>
+      <li><b>压超调</b>：给较大阶跃（1V→2V），观察超调量。调 $\alpha$</li>
+      <li><b>平滑控制量</b>：观察 $u$ 曲线是否有高频抖动。调 $\beta$ 或 $\Delta u_\text{max}$</li>
+      <li><b>验证抗扰</b>：稳态时手动扰动水位，观察恢复速度</li>
+    </ol>
+    <div class="note-box">
+      <div class="box-label">原则</div>
+      先保证稳定（无振荡），再追求快速（响应速度），最后优化平滑（控制量）。不要同时调多个参数。
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s3">
+  <div class="slide-header"><span>3. 第一步：确认稳态</span></div>
+  <div class="slide-body">
+    <span class="tag-bg">○ 诊断</span>
+    <p>SP 固定，等待系统稳定后，观察 $y$ 是否收敛到 SP。</p>
+    <table class="note-table">
+      <tr><th>现象</th><th>可能原因</th><th>处理</th></tr>
+      <tr><td>$y$ 收敛但有静差</td><td>CARIMA 积分未生效，或工作点估计偏差</td><td>检查 $\tilde A$ 构造是否正确</td></tr>
+      <tr><td>$u$ 立刻打到上限（20mA）</td><td>稳态增益估计错误，$b_0$ 太小</td><td>检查归一化空间辨识是否正确</td></tr>
+      <tr><td>$y$ 持续振荡</td><td>$\lambda$ 太小或 $\alpha$ 太小</td><td>增大 $\lambda$（先试 5~10）</td></tr>
+      <tr><td>$y$ 完全不动</td><td>丢番图递推 bug，$G_2$ 全零</td><td>检查 $F_j$ 维度和 $G\_\text{mat}$ 索引</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide" id="s4">
+  <div class="slide-header"><span>4. 第二步：调响应速度</span></div>
+  <div class="slide-body">
+    <span class="tag-bg">○ 调节</span>
+    <p>给小阶跃（1V→1.5V），观察上升时间（从 10% 到 90% 的时间）。</p>
+    <p>水箱系统时间常数 $\tau \approx 64$ 步，加上 $k=24$ 步时延，理论上升时间约 100~150 步。</p>
+    <table class="note-table">
+      <tr><th>现象</th><th>调节</th></tr>
+      <tr><td>上升太慢（>200步）</td><td>减小 $\lambda$（从 2 → 1 → 0.5）</td></tr>
+      <tr><td>上升太快但振荡</td><td>增大 $\lambda$（从 2 → 5 → 10）</td></tr>
+      <tr><td>上升正常但有超调</td><td>进入第三步调 $\alpha$</td></tr>
+    </table>
+    <div class="note-box">
+      <div class="box-label">$\lambda$ 的物理含义</div>
+      $\lambda$ 越大，控制律越"保守"，每步控制增量越小，响应越慢但越平稳。$\lambda=0$ 时退化为纯最小方差控制（可能不稳定）。
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s5">
+  <div class="slide-header"><span>5. 第三步：压超调</span></div>
+  <div class="slide-body">
+    <span class="tag-bg">○ 调节</span>
+    <p>给大阶跃（1V→2V 或 1V→3V），观察超调量（超过 SP 的最大偏差）。</p>
+    <p>超调的根本原因：$k=24$ 步时延，控制量推出去后要等 24 步才看到效果，容易冲过头。</p>
+    <table class="note-table">
+      <tr><th>超调量</th><th>调节</th></tr>
+      <tr><td>&gt;20%</td><td>增大 $\alpha$（0.9 → 0.92 → 0.95）</td></tr>
+      <tr><td>10%~20%</td><td>$\alpha=0.9$ 是合理范围，可接受</td></tr>
+      <tr><td>&lt;5%</td><td>$\alpha$ 可能过大，响应偏慢</td></tr>
+    </table>
+    <div class="def-box">
+      <div class="box-label">$\alpha$ 与响应速度的 trade-off</div>
+      $\alpha=0.9$：约 30 步逼近 SP，适中<br>
+      $\alpha=0.95$：约 60 步逼近 SP，超调小但慢<br>
+      $\alpha=0.98$：约 200 步逼近 SP，几乎无超调但非常慢
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s6">
+  <div class="slide-header"><span>6. 第四步：平滑控制量</span></div>
+  <div class="slide-body">
+    <span class="tag-bg">○ 调节</span>
+    <p>观察 $u(t)$ 曲线，理想情况是平滑的 S 形上升，不应有高频抖动。</p>
+    <table class="note-table">
+      <tr><th>现象</th><th>调节</th></tr>
+      <tr><td>$u$ 高频抖动（每步大幅跳变）</td><td>减小 $\Delta u_\text{max}$（0.1 → 0.05）或增大 $\lambda$</td></tr>
+      <tr><td>$u$ 在设定值切换时有大尖峰</td><td>增大 $\alpha$（柔化设定值跳变）</td></tr>
+      <tr><td>$u$ 长时间饱和在 20mA</td><td>检查 $b_0$ 是否太小（稳态增益问题）</td></tr>
+    </table>
+    <div class="note-box">
+      <div class="box-label">$\beta$ 的作用</div>
+      $\beta$ 控制控制序列的衰减速度，不直接影响超调，但影响控制量的平滑程度。$\beta=0.7$ 是经验最优值，一般不需要调。
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s7">
+  <div class="slide-header"><span>7. 常见故障诊断</span></div>
+  <div class="slide-body">
+    <span class="tag-bg">⚠ 故障排查</span>
+    <table class="note-table">
+      <tr><th>故障现象</th><th>根本原因</th><th>解决方法</th></tr>
+      <tr><td>控制量立刻打到 20mA 上限</td><td>$b_0$ 太小（稳态增益不足），或归一化空间辨识错误</td><td>重新在归一化空间辨识，验证 $K_{ss} = b_0/(1+a_1) \approx 1.5$</td></tr>
+      <tr><td>$y$ 完全不跟踪 SP</td><td>$F_j$ 维度错误（2项而非3项）</td><td>检查 <code>na_t = len(A_tilde)-1 = 2</code></td></tr>
+      <tr><td>G2 数值异常（比 Python 大 4 倍）</td><td>$G\_\text{mat}$ 索引偏移</td><td>检查 <code>G_new[jj] = e*b0</code>（最高项在 jj，不是 jj+1）</td></tr>
+      <tr><td>RLS 参数持续漂移</td><td>遗忘因子 $\lambda$ 太小</td><td>$\lambda=0.98 \to 0.995$</td></tr>
+      <tr><td>MSVC C2374 编译错误</td><td>同一函数作用域内多次声明 <code>int i/j/k</code></td><td>每个 for 循环用 <code>{ }</code> 包裹</td></tr>
+      <tr><td>初始控制量爆到上限</td><td><code>u_prev=0</code> 对应 4mA，但系统需要更高电流维持水位</td><td>将 <code>u_prev</code> 初始化为稳态电流对应的归一化值</td></tr>
+    </table>
+  </div>
+</div>
+
+</main>
+<script>
+// sidebar.js — 侧边栏折叠 + 当前页高亮 + 状态持久化
+
+(function () {
+  const KEY = 'note-sidebar-hidden';
+
+  // 1. 折叠按钮行为
+  function wireToggle() {
+    const btn = document.querySelector('button.sidebar-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const hidden = document.body.classList.toggle('sidebar-hidden');
+      document.querySelector('aside.sidebar')?.classList.toggle('collapsed', hidden);
+      try { localStorage.setItem(KEY, hidden ? '1' : '0'); } catch (e) {}
+      btn.textContent = hidden ? '☰' : '×';
+      btn.title = hidden ? '展开目录' : '收起目录';
+    });
+    // 初始状态：从 localStorage 恢复
+    let hidden = false;
+    try { hidden = localStorage.getItem(KEY) === '1'; } catch (e) {}
+    if (hidden) {
+      document.body.classList.add('sidebar-hidden');
+      document.querySelector('aside.sidebar')?.classList.add('collapsed');
+      btn.textContent = '☰';
+      btn.title = '展开目录';
+    } else {
+      btn.textContent = '×';
+      btn.title = '收起目录';
+    }
+  }
+
+  // 2. 按当前 URL 高亮菜单项
+  function highlightCurrent() {
+    const path = location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('aside.sidebar a').forEach(a => {
+      const href = a.getAttribute('href');
+      if (href && href.split('#')[0] === path) a.classList.add('active');
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    wireToggle();
+    highlightCurrent();
+  });
+})();
+
+</script>
+</body>
+</html>

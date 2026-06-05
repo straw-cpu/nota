@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="mynotes:template" content="minimal_slide">
+<meta name="mynotes:theme" content="default">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>§6 补充答疑 · 水箱 GPC 实验</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']], tags: 'ams' },
+  options: { skipHtmlTags: ['script','noscript','style','textarea'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+/* =============================================================
+ *  theme.css  —  主题层：只管"视觉"（颜色、字体、圆角、阴影）
+ *  切换风格时只动这个文件；布局/交互在 layout.css，不改。
+ *  后续要做"蓝色学术风""暗色风""极简风"只需复制本文件改变量+框样式。
+ * ============================================================= */
+
+:root {
+  /* ── 色板 ── */
+  --accent-dark:  #a00000;   /* 主色（标题、边框、active） */
+  --accent-mid:   #c0392b;   /* 悬停、公式链接 */
+  --accent-pale:  #fdecec;   /* 定义框底色 */
+  --gray-bar:     #ededed;   /* slide header 灰条 */
+  --blue-pale:    #f0f6ff;   /* 备注框 */
+  --green-pale:   #f0fff4;   /* 例题框 */
+  --yellow-pale:  #fff8e6;   /* 思考题框 */
+
+  --border:       #d4d4d4;
+  --text:         #1a1a1a;
+  --muted:        #666;
+
+  --bg-page:      #f7f7f7;
+  --bg-card:      #fff;
+  --bg-sidebar:   #fafafa;
+
+  /* ── 字体 ── */
+  --font-main:    "PingFang SC", "Microsoft YaHei", "Liberation Serif", serif;
+  --font-mono:    "SFMono-Regular", Consolas, monospace;
+
+  /* ── 尺寸 ── */
+  --radius:       4px;
+  --radius-lg:    6px;
+  --shadow-card:  0 1px 3px rgba(0,0,0,.05);
+  --sidebar-w:    260px;
+}
+
+/* ── 顶部标题 slide ── */
+header.title-slide {
+  background: var(--bg-card);
+  border-bottom: 2px solid var(--accent-dark);
+}
+header.title-slide h1 { color: var(--accent-dark); }
+
+/* ── slide 卡片 ── */
+.slide {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+.slide-header {
+  background: var(--gray-bar);
+  border-bottom: 2px solid var(--accent-dark);
+  color: var(--accent-dark);
+}
+
+/* ── 要点列表三角 ── */
+ul.tri > li::before { color: var(--accent-dark); }
+
+/* ── 定义框（粉红） ── */
+.def-box {
+  background: var(--accent-pale);
+  border: 1px solid #e8b4b4;
+  border-radius: var(--radius);
+}
+.def-box .box-label { color: var(--accent-dark); }
+
+/* ── 备注框（浅蓝） ── */
+.note-box {
+  background: var(--blue-pale);
+  border-left: 3px solid #5a8ac0;
+}
+.note-box .box-label { color: #3a6a9a; }
+
+/* ── 例题框（浅绿） ── */
+.ex-box {
+  background: var(--green-pale);
+  border-left: 3px solid #2a9d5c;
+}
+.ex-box .box-label { color: #2a7a4a; }
+
+/* ── 思考题框（浅黄） ── */
+.ask-box {
+  background: var(--yellow-pale);
+  border-left: 3px solid #d97706;
+}
+.ask-box .box-label { color: #b8600a; }
+
+/* ── 公式链接（MathJax） ── */
+mjx-container a[href^="#mjx-eqn"],
+mjx-container a[href^="#mjx-eqn"]:visited {
+  color: var(--accent-mid);
+  text-decoration: none;
+}
+mjx-container a[href^="#mjx-eqn"]:hover { text-decoration: underline; }
+
+/* ── 侧边栏主题色 ── */
+aside.sidebar { background: var(--bg-sidebar); }
+aside.sidebar .sb-title { color: var(--accent-dark); }
+aside.sidebar a.active {
+  background: var(--accent-pale);
+  border-left-color: var(--accent-dark);
+  color: var(--accent-dark);
+}
+aside.sidebar a:hover { color: var(--accent-dark); }
+
+/* ── 节间导航按钮 ── */
+nav.section-nav a:hover {
+  color: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+/* ── 折叠按钮 ── */
+button.sidebar-toggle:hover {
+  background: var(--accent-pale);
+  color: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+/* =============================================================
+ *  layout.css  —  布局层：只管"骨架"（间距、位置、字号、打印）
+ *  所有颜色/主题相关样式在 theme.css。切主题时这里不动。
+ * ============================================================= */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-main);
+  background: var(--bg-page);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.75;
+}
+html { scroll-behavior: smooth; }
+mjx-container[display="true"] { scroll-margin-top: 70px; }
+
+/* ══════════ 侧边栏 ══════════ */
+aside.sidebar {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: var(--sidebar-w);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 18px 14px 24px;
+  font-size: 12.5px;
+  z-index: 100;
+  transition: transform 0.25s ease;
+}
+aside.sidebar.collapsed {
+  transform: translateX(calc(-1 * var(--sidebar-w)));
+}
+aside.sidebar .sb-title {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 8px 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+  padding-right: 32px;             /* 给右上角关闭按钮留位 */
+}
+aside.sidebar .sb-home {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 2px 8px 8px;
+}
+aside.sidebar ul { list-style: none; padding: 0; }
+aside.sidebar li { margin: 0; }
+aside.sidebar a {
+  display: block;
+  padding: 5px 10px;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 3px;
+  border-left: 2px solid transparent;
+  line-height: 1.5;
+}
+aside.sidebar a:hover { background: var(--bg-card); }
+aside.sidebar a.active { font-weight: 600; }
+aside.sidebar .sb-group {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 10px 10px 4px;
+  letter-spacing: 0.5px;
+}
+aside.sidebar ul.sub { padding-left: 14px; margin: 2px 0 4px; }
+aside.sidebar ul.sub a {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 2px 8px;
+}
+
+/* ══════════ 折叠按钮 ══════════ */
+button.sidebar-toggle {
+  position: fixed;
+  top: 14px;
+  z-index: 200;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--muted);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 14px;
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: left 0.25s ease, right 0.25s ease;
+  padding: 0;
+  line-height: 1;
+}
+/* 侧边栏展开：按钮贴在侧边栏右上角内 */
+button.sidebar-toggle {
+  left: calc(var(--sidebar-w) - 36px);
+}
+/* 侧边栏收起：按钮贴到页面左上角 */
+body.sidebar-hidden button.sidebar-toggle {
+  left: 14px;
+}
+
+/* ══════════ 主体 ══════════ */
+main.with-sidebar {
+  margin-left: var(--sidebar-w);
+  max-width: 880px;
+  padding: 28px 24px 60px 34px;
+  transition: margin-left 0.25s ease;
+}
+body.sidebar-hidden main.with-sidebar {
+  margin-left: 0;
+  max-width: 1000px;
+  margin-right: auto;
+  padding-left: 60px;              /* 为按钮腾点空间 */
+}
+
+/* ══════════ 窄屏 ══════════ */
+@media (max-width: 900px) {
+  aside.sidebar {
+    position: fixed;
+    width: 80vw;
+    max-width: 300px;
+    box-shadow: 2px 0 12px rgba(0,0,0,.1);
+  }
+  main.with-sidebar { margin-left: 0; padding: 20px; }
+  body:not(.sidebar-hidden) button.sidebar-toggle { left: calc(80vw - 36px); }
+  /* 窄屏默认收起 */
+  aside.sidebar:not(.forced-open) { transform: translateX(-100%); }
+  body.sidebar-hidden aside.sidebar { transform: translateX(-100%); }
+}
+
+/* ══════════ 标题 slide ══════════ */
+header.title-slide {
+  padding: 36px 40px 26px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+header.title-slide h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+header.title-slide .subtitle {
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+header.title-slide .meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ══════════ Slide 卡片 ══════════ */
+.slide {
+  margin-bottom: 22px;
+  overflow: hidden;
+}
+.slide-header {
+  padding: 10px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.slide-header .pdf-ref {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+.slide-body { padding: 18px 28px 22px; }
+.slide-body > * + * { margin-top: 10px; }
+
+/* ══════════ 三角要点 ══════════ */
+ul.tri { list-style: none; padding-left: 4px; }
+ul.tri > li { position: relative; padding-left: 22px; margin-bottom: 6px; }
+ul.tri > li::before {
+  content: "▸";
+  position: absolute; left: 2px; top: 0;
+  font-size: 13px;
+}
+ul.tri ul.dash { list-style: none; padding-left: 10px; margin-top: 4px; }
+ul.tri ul.dash > li {
+  position: relative; padding-left: 14px;
+  color: var(--muted); font-size: 13.5px;
+}
+ul.tri ul.dash > li::before { content: "–"; position: absolute; left: 0; }
+
+/* ══════════ 定义/备注/例题/思考 框（布局共性） ══════════ */
+.def-box  { padding: 14px 18px; margin: 10px 0; }
+.note-box { padding: 10px 14px; font-size: 13.5px; border-radius: 0 var(--radius) var(--radius) 0; }
+.ex-box   { padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0; }
+.ask-box  { padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0; }
+.def-box .box-label,
+.note-box .box-label,
+.ex-box .box-label,
+.ask-box .box-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+.def-box .box-label { letter-spacing: 0.6px; margin-bottom: 6px; }
+
+/* ══════════ 公式居中 ══════════ */
+.formula { text-align: center; padding: 6px 0; overflow-x: auto; }
+
+/* ══════════ 推导折叠 ══════════ */
+details.derive {
+  background: #fafafa;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-top: 10px;
+}
+details.derive summary {
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-weight: 600;
+  user-select: none;
+}
+details.derive .derive-body { padding: 8px 16px 14px; font-size: 13.5px; }
+
+/* ══════════ 节间导航 ══════════ */
+nav.section-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+nav.section-nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+}
+nav.section-nav a.disabled { color: #ccc; pointer-events: none; background: #f5f5f5; }
+
+/* ══════════ 页脚 ══════════ */
+footer.page-end {
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 30px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+/* ══════════ 打印 ══════════ */
+@media print {
+  @page { size: 13.333in 7.5in; margin: 0.5in 0.55in 0.55in; }
+  html, body { background: #fff !important; font-size: 15.5px; line-height: 1.85; }
+  aside.sidebar, button.sidebar-toggle { display: none; }
+  main.with-sidebar { margin-left: 0; max-width: none; padding: 0; }
+  header.title-slide, .slide {
+    page-break-before: always; break-before: page;
+  }
+  header.title-slide:first-child { page-break-before: auto; break-before: auto; }
+  .slide-header { page-break-after: avoid; break-after: avoid-page; }
+  .def-box, .note-box, .ex-box, .ask-box, .formula { page-break-inside: avoid; break-inside: avoid-page; }
+  .slide { border: 1px solid #999; box-shadow: none; margin: 0; }
+  .slide-header {
+    background: #ededed !important; font-size: 20px; padding: 14px 28px;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .def-box, .note-box, .ex-box, .ask-box, .slide-header {
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  nav.section-nav { display: none; }
+}
+
+/* ══════════ 三档详细程度折叠 ══════════
+ *  ★ 核心  → def-box（红框，完整展示）
+ *  ▷ 推导  → details.derive（灰色折叠，默认收起）
+ *  ○ 背景  → .bg-note（浅灰文字，无框）
+ * ============================================ */
+
+/* 推导折叠：已在上方定义 details.derive，此处补充三档标记 */
+details.derive[open] > summary { color: var(--accent-dark); }
+details.derive summary::marker { content: ""; }
+details.derive summary::-webkit-details-marker { display: none; }
+
+/* 背景说明（○ 档） */
+.bg-note {
+  font-size: 13px;
+  color: var(--muted);
+  padding: 4px 0 4px 14px;
+  border-left: 2px solid var(--border);
+  margin: 6px 0;
+}
+
+/* 难度标签 */
+.tag-core  { display:inline-block; font-size:10px; font-weight:700; padding:1px 6px; border-radius:3px; background:var(--accent-pale); color:var(--accent-dark); margin-right:6px; vertical-align:middle; }
+.tag-deriv { display:inline-block; font-size:10px; font-weight:700; padding:1px 6px; border-radius:3px; background:#f5f5f5; color:#666; margin-right:6px; vertical-align:middle; }
+.tag-bg    { display:inline-block; font-size:10px; font-weight:700; padding:1px 6px; border-radius:3px; background:#f0f6ff; color:#3a6ea5; margin-right:6px; vertical-align:middle; }
+
+/* ▷ 推导折叠块内容区 */
+details.derive summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: #888;
+  padding: 6px 0;
+  user-select: none;
+  list-style: none;
+}
+details.derive summary:hover { color: var(--accent-dark); }
+details.derive .derive-body {
+  padding: 12px 16px;
+  background: #f8f8f8;
+  border-left: 3px solid #d0d0d0;
+  border-radius: 0 4px 4px 0;
+  font-size: 13px;
+  line-height: 1.8;
+  margin-top: 4px;
+}
+details.derive .derive-body p { margin: 6px 0; }
+
+/* nav 禁用态 */
+nav.section-nav a.disabled {
+  color: var(--muted);
+  pointer-events: none;
+  cursor: default;
+  border-color: transparent;
+}
+
+/* GPC 推导步骤小标题 */
+h2.step {
+  font-size: 13px;
+  color: var(--accent-dark);
+  margin: 14px 0 8px;
+  font-weight: 700;
+}
+
+/* pre 窄屏防溢出 */
+.slide-body pre { overflow-x: auto; white-space: pre; }
+
+/* ══════════ 公式交叉超链接 ══════════ */
+a.eq-ref {
+  color: var(--accent-mid);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px dashed var(--accent-mid);
+  font-size: 0.95em;
+}
+a.eq-ref:hover { color: var(--accent-dark); border-bottom-style: solid; }
+
+/* 公式锚点高亮（被跳转时） */
+.formula:target, mjx-container:target {
+  background: #fff8e6;
+  border-radius: 4px;
+  outline: 2px solid #f0c040;
+  outline-offset: 4px;
+}
+
+/* ══════════ 表格 ══════════ */
+table.note-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 10px 0;
+}
+table.note-table th {
+  background: var(--accent-pale);
+  border: 1px solid var(--border);
+  padding: 7px 12px;
+  text-align: left;
+  font-weight: 700;
+}
+table.note-table td {
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  vertical-align: top;
+}
+table.note-table tr:nth-child(even) td { background: #fafafa; }
+
+mjx-container, .MathJax { text-transform: none !important; }
+</style>
+</head>
+<body>
+<button class="sidebar-toggle" type="button" aria-label="切换目录">×</button>
+<aside class="sidebar">
+  <div class="sb-title">水箱 GPC 实验笔记</div>
+  <a class="sb-home" href="index.html">▣ 返回总目录</a>
+  <div class="sb-group">§6 补充答疑（当前）</div>
+  <ul>
+    <li><a href="#q-list">问题清单</a></li>
+    <li><a href="#q1">§1-Q1 一二阶惯性纯滞后</a></li>
+    <li><a href="#q2">§1-Q2 AIC 量化依据</a></li>
+    <li><a href="#q3">§1-Q3 最小二乘推导</a></li>
+    <li><a href="#q4">§2-Q1 E/F/G 项数与教材不同</a></li>
+    <li><a href="#q5">§2-Q2 A_tilde 为何是二阶</a></li>
+    <li><a href="#q6">§4-Q1 RLS 对 GPC 推导的影响</a></li>
+  </ul>
+  <div class="sb-group">其他章节</div>
+  <ul>
+    <li><a href="s1_系统辨识.html">§1 系统辨识</a></li>
+    <li><a href="s2_CARIMA与丢番图.html">§2 CARIMA 与丢番图</a></li>
+    <li><a href="s3_GPC控制律.html">§3 GPC 控制律</a></li>
+    <li><a href="s4_RLS在线辨识.html">§4 RLS 在线辨识</a></li>
+    <li><a href="s5_调参指南.html">§5 调参指南</a></li>
+  </ul>
+</aside>
+<main class="with-sidebar">
+<header class="title-slide">
+  <h1>§6 &nbsp;补充答疑</h1>
+  <div class="subtitle">理论深挖 · 推导细节 · 与教材的差异说明</div>
+  <div class="meta">水箱液位控制实验 · 阅读前建议先过一遍 §1~§4</div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="q-list">
+  <div class="slide-header"><span>问题清单</span></div>
+  <div class="slide-body">
+    <p>以下问题来自阅读 §1~§4 后的疑问，按章节分组：</p>
+    <table class="note-table">
+      <tr><th>编号</th><th>来源</th><th>问题</th></tr>
+      <tr><td><a href="#q1">§1-Q1</a></td><td>§1 辨识</td><td>水箱系统为什么是一/二阶惯性纯滞后系统？自控中一/二阶的含义？</td></tr>
+      <tr><td><a href="#q2">§1-Q2</a></td><td>§1 §4 AIC</td><td>AIC 进行阶次扫描，比较的量化依据是什么？</td></tr>
+      <tr><td><a href="#q3">§1-Q3</a></td><td>§1 §5 最小二乘</td><td>最小二乘辨识的理论推导、问题对象圈定，以及归一化的部分</td></tr>
+      <tr><td><a href="#q4">§2-Q1</a></td><td>§2 §1-4</td><td>为什么和教材不一样？E、F、G 的项数也不一样？</td></tr>
+      <tr><td><a href="#q5">§2-Q2</a></td><td>§2 §5</td><td>没看懂为什么 $\tilde A$ 是二阶，$F_j$ 有 3 项</td></tr>
+      <tr><td><a href="#q6">§4-Q1</a></td><td>§4 §2</td><td>RLS 原理，对 GPC 整个推导的影响</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="q1">
+  <div class="slide-header"><span>§1-Q1 &nbsp;水箱系统为什么是一/二阶惯性纯滞后系统</span></div>
+  <div class="slide-body">
+    <span class="tag-bg">○ 物理直觉</span>
+    <p><b>纯滞后</b>：泵的驱动电流变化后，水流经管道到达水箱需要一段固定时间，这段时间内输出完全不响应。这就是纯时延 $k=24$ 步（24秒）。</p>
+    <p><b>惯性</b>：水箱有容积，水位不能瞬间变化——就像电容充电，需要时间积累。这产生了"惯性"（低通滤波效应）。</p>
+
+    <div class="def-box">
+      <div class="box-label">自控中的阶次含义</div>
+      <p>系统的"阶次"对应传递函数分母多项式的次数，等于系统的独立储能元件数量：</p>
+      <table class="note-table">
+        <tr><th>阶次</th><th>物理含义</th><th>传递函数</th><th>阶跃响应</th></tr>
+        <tr><td>一阶</td><td>1个储能元件（水箱容积）</td><td>$G(s) = \frac{K}{\tau s + 1} e^{-\theta s}$</td><td>指数上升，无超调</td></tr>
+        <tr><td>二阶</td><td>2个储能元件（如串联两个水箱，或水箱+管道惯性）</td><td>$G(s) = \frac{K}{(\tau_1 s+1)(\tau_2 s+1)} e^{-\theta s}$</td><td>S形上升，可能有超调</td></tr>
+      </table>
+    </div>
+
+    <p><b>为什么 AIC 选出 na=4 而不是 na=1？</b></p>
+    <p>真实水箱并不是理想的一阶系统。管道、阀门、传感器滤波都会引入额外的动态，使得实际响应比纯一阶更复杂。AIC 选 na=4 是因为数据里确实有这些高阶动态。但对于控制器设计，na=1 已经捕捉了主要动态（主极点 0.9846），RLS 在线更新可以弥补模型误差。</p>
+
+    <div class="note-box">
+      <div class="box-label">离散时间与连续时间的对应</div>
+      连续时间一阶系统极点在 $s = -1/\tau$，离散化后极点在 $z = e^{-T/\tau}$。<br>
+      本实验 $a_1 = 0.9846$（极点），$T=1$s，则 $\tau = -T/\ln(0.9846) \approx 64$ 步 = 64s。<br>
+      这与水箱的物理时间常数（约 1~2 分钟）吻合。
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="q2">
+  <div class="slide-header"><span>§1-Q2 &nbsp;AIC 阶次扫描的量化依据</span></div>
+  <div class="slide-body">
+    <span class="tag-core">★ 核心</span>
+    <p>AIC（Akaike Information Criterion，赤池信息准则）的核心思想是在<b>拟合精度</b>和<b>模型复杂度</b>之间取平衡：</p>
+    $$ \text{AIC} = N \ln(\hat\sigma_e^2) + 2 \cdot n_\text{params} \tag{6.1}$$
+    <ul class="tri">
+      <li>$N \ln(\hat\sigma_e^2)$：残差方差的对数，越小说明拟合越好（精度项）</li>
+      <li>$2 n_\text{params}$：参数数量的惩罚（复杂度项），防止过拟合</li>
+      <li>$n_\text{params} = n_a + n_b + 1$（ARX 模型的参数个数）</li>
+    </ul>
+
+    <div class="def-box">
+      <div class="box-label">为什么用对数似然而不是直接用 RMSE</div>
+      <p>AIC 来自信息论，本质是最大化模型的对数似然函数。对于高斯噪声假设下的 ARX 模型，对数似然正比于 $-N\ln(\hat\sigma_e^2)$，所以最小化 AIC 等价于在精度和复杂度之间找最优平衡。</p>
+      <p>直接用 RMSE 比较不同阶次的模型会偏向高阶（参数越多 RMSE 越小），AIC 的惩罚项纠正了这个偏差。</p>
+    </div>
+
+    <p><b>量化依据</b>：AIC 差值 $\Delta\text{AIC} = \text{AIC}_i - \text{AIC}_\text{min}$</p>
+    <ul class="tri">
+      <li>$\Delta\text{AIC} < 2$：两个模型几乎等价，选简单的</li>
+      <li>$\Delta\text{AIC} \in [2, 10]$：较弱的证据支持更复杂的模型</li>
+      <li>$\Delta\text{AIC} > 10$：强证据支持更复杂的模型</li>
+    </ul>
+    <p>本实验 na=1 vs na=4 的 $\Delta\text{AIC} = -21843 - (-21452) = -391$，差距极大，说明 na=4 在统计上显著优于 na=1。但我们选 na=1 是出于工程考虑（简单、便于调试），不是统计最优。</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="q3">
+  <div class="slide-header"><span>§1-Q3 &nbsp;最小二乘辨识的推导与归一化</span></div>
+  <div class="slide-body">
+    <span class="tag-core">★ 核心</span>
+
+    <p><b>问题圈定</b>：已知 $N$ 组输入输出数据 $\{u(t), y(t)\}$，假设系统满足 ARX 模型：</p>
+    $$ y(t) = \varphi(t)^T \theta + e(t) \tag{6.2}$$
+    <p>其中 $\varphi(t) = [-y(t-1), u(t-k)]^T$（na=1, nb=0），$\theta = [a_1, b_0]^T$ 是待估参数，$e(t)$ 是白噪声。</p>
+
+    <p><b>矩阵形式</b>：把所有时刻堆叠：</p>
+    $$ \mathbf{Y} = \mathbf{\Phi}\,\theta + \mathbf{e}, \quad \mathbf{Y} \in \mathbb{R}^M,\; \mathbf{\Phi} \in \mathbb{R}^{M \times 2} \tag{6.3}$$
+
+    <p><b>最小二乘目标</b>：最小化残差平方和：</p>
+    $$ \min_\theta \|\mathbf{Y} - \mathbf{\Phi}\theta\|^2 \tag{6.4}$$
+
+    <p><b>求导令其为零</b>（正规方程）：</p>
+    $$ \frac{\partial}{\partial\theta}\|\mathbf{Y} - \mathbf{\Phi}\theta\|^2 = -2\mathbf{\Phi}^T(\mathbf{Y} - \mathbf{\Phi}\theta) = 0 \tag{6.5}$$
+    $$ \Rightarrow \mathbf{\Phi}^T\mathbf{\Phi}\,\hat\theta = \mathbf{\Phi}^T\mathbf{Y} \tag{6.6}$$
+    $$ \Rightarrow \hat\theta = (\mathbf{\Phi}^T\mathbf{\Phi})^{-1}\mathbf{\Phi}^T\mathbf{Y} \tag{6.7}$$
+
+    <div class="def-box">
+      <div class="box-label">为什么归一化后要重新辨识</div>
+      <p>设原始空间的模型为 $y = a_1 y_{-1} + b_0^\text{raw} u_{-k}$，归一化后 $y_n = y/Y_R$，$u_n = u/U_R$（简化，忽略偏移），则：</p>
+      $$ y_n \cdot Y_R = a_1 \cdot y_{n,-1} \cdot Y_R + b_0^\text{raw} \cdot u_{n,-k} \cdot U_R$$
+      $$ y_n = a_1 \cdot y_{n,-1} + \underbrace{b_0^\text{raw} \cdot \frac{U_R}{Y_R}}_{b_0^\text{norm}} \cdot u_{n,-k} \tag{6.8}$$
+      <p>所以 $b_0^\text{norm} = b_0^\text{raw} \times U_R/Y_R = 0.0055 \times 16/3.634 \approx 0.0242$，与直接在归一化空间辨识的结果 0.02436 吻合。</p>
+      <p><b>$a_1$ 不变</b>，因为它是 $y/y$ 的比值，量纲相消。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="q4">
+  <div class="slide-header"><span>§2-Q1 &nbsp;为什么和教材不一样？E/F/G 项数不同？</span></div>
+  <div class="slide-body">
+    <span class="tag-bg">○ 对照教材 §5.2~§5.3</span>
+    <p>教材（第五章 §5.2）的 CARIMA 模型式(5.1)：</p>
+    $$ A(q^{-1})\Delta y(t) = B(q^{-1})\Delta u(t-1) + C(q^{-1})\xi(t) \tag{教材5.1}$$
+    <p>丢番图恒等式式(5.3)：$1 = E_j(q^{-1})\tilde A(q^{-1}) + q^{-j}F_j(q^{-1})$，其中 $\tilde A = A\Delta$。</p>
+    <p>教材 §5.3 式(5.9)~(5.11) 给出的 $F_j$ 初值（$j=1$）：</p>
+    $$ F_1(q^{-1}) = (1+a_1) + (a_1+a_2)q^{-1} + \cdots + (a_{n_a-1}+a_{n_a})q^{-(n_a-1)} + a_{n_a}q^{-n_a} \tag{教材5.10}$$
+    <p>这里 $F_1$ 有 $n_a+1$ 项（$q^0$ 到 $q^{-n_a}$），与我们代码一致。</p>
+
+    <div class="def-box">
+      <div class="box-label">看起来不一样的原因</div>
+      <p>教材式(5.10) 的系数写法是 $(a_{i-1}+a_i)$，而我们代码用的是 $(\tilde A_i - \tilde A_{i+1})$。两者等价，只是展开方式不同：</p>
+      $$ \tilde A_i - \tilde A_{i+1} = (a_{i-1} - a_i) - (a_i - a_{i+1}) \quad \text{（对 } \tilde A = A\Delta \text{ 展开后）}$$
+      <p>教材式(5.18) 的递推：$f_j^i = f_{j-1}^{i+1} - e_{j-1}(a_{i+1}-a_i)$，与我们代码完全一致。</p>
+      <p><b>结论：代码与教材完全一致，只是初值的书写形式不同。</b></p>
+    </div>
+
+    <p><b>$G_j$ 的长度</b>：教材式(5.16) $G_j = E_j(q^{-1})B(q^{-1})$，长度 $= (j-1) + (n_b+1) = n_b+j$。本实验 $n_b=0$，所以 $G_j$ 长度 $= j$，与教材一致。</p>
+
+    <table class="note-table">
+      <tr><th>量</th><th>教材定义</th><th>本实验（na=1, nb=0）</th></tr>
+      <tr><td>$\deg E_j$</td><td>$j-1$</td><td>$j-1$（代码不显式存储）</td></tr>
+      <tr><td>$F_j$ 项数</td><td>$n_a+1$（对 $\tilde A$ 递推）</td><td>$n_a+1 = 2$（但存3项，含 $q^{-2}$ 项）</td></tr>
+      <tr><td>$G_j$ 长度</td><td>$n_b+j$</td><td>$j$（$n_b=0$）</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="q5">
+  <div class="slide-header"><span>§2-Q2 &nbsp;为什么 $\tilde A$ 是二阶，$F_j$ 有 3 项</span></div>
+  <div class="slide-body">
+    <span class="tag-core">★ 核心 · 对照教材 §5.2</span>
+
+    <p>教材 §5.2 式(5.2) 明确写出：$\tilde A(q^{-1}) = A(q^{-1})\Delta(q^{-1})$，阶次 $= n_a + 1$。</p>
+
+    <p><b>逐步拆解（na=1）：</b></p>
+    <p>$A = 1 + a_1 q^{-1}$（一阶，$a_1 = -0.9846$），$\Delta = 1 - q^{-1}$（一阶），则：</p>
+    $$ \tilde A = A \cdot \Delta = (1 + a_1 q^{-1})(1 - q^{-1}) = 1 + (a_1-1)q^{-1} - a_1 q^{-2} \tag{6.9}$$
+    <p>代入数值：$\tilde A = [1,\ -1.9846,\ 0.9846]$，阶次 $= 2$，有 <b>3 个系数</b>。</p>
+
+    <div class="def-box">
+      <div class="box-label">丢番图恒等式中 $F_j$ 的阶次</div>
+      <p>恒等式 $1 = E_j \tilde A + q^{-j} F_j$ 中，两边次数平衡要求：</p>
+      <ul class="tri">
+        <li>$\deg(E_j \tilde A) = (j-1) + (n_a+1) = j + n_a$</li>
+        <li>$\deg(q^{-j} F_j) = j + \deg F_j$</li>
+        <li>两边最高次相等：$\deg F_j = n_a$</li>
+      </ul>
+      <p>$na=1$ 时 $\deg F_j = 1$，即 $F_j$ 有 $q^0$ 和 $q^{-1}$ 两项，系数向量长度 $= n_a + 1 = 2$。</p>
+      <p><b>但代码里存了 3 项</b>（$f_j^0, f_j^1, f_j^2$），这是因为递推公式式(5.18) 中 $f_j^{n_a} = e_{j-1} \cdot a_{n_a}$ 用到了 $\tilde A$ 的第 $n_a+1$ 个系数（即 $\tilde A_2 = a_1 = 0.9846$），所以实现时把 $F_j$ 扩展为与 $\tilde A$ 等长（3项），第3项 $f_j^2$ 对应 $q^{-2}$ 系数。</p>
+    </div>
+
+    <p><b>自由响应为什么需要 $y(t-2)$</b>：</p>
+    <p>$Y_1[j] = F_j(q^{-1}) y(t) = f_j^0 y(t) + f_j^1 y(t-1) + f_j^2 y(t-2)$。$\tilde A$ 是二阶，系统的"记忆"深度是 2 步，所以自由响应需要 $y(t), y(t-1), y(t-2)$ 三个值。</p>
+
+    <p><b>规律</b>：$F_j$ 存储长度 $= n_a + 2$（$= \deg\tilde A + 1$），自由响应需要 $n_a+2$ 个历史 $y$ 值。</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="q6">
+  <div class="slide-header"><span>§4-Q1 &nbsp;RLS 原理及对 GPC 推导的影响</span></div>
+  <div class="slide-body">
+    <span class="tag-core">★ 核心 · 对照教材 §5.1</span>
+
+    <p>教材 §5.1 图1 给出了自控正控制的基本框图：<b>辨识器</b>（在线估计模型参数）+ <b>设计器</b>（根据当前参数设计控制律）+ <b>控制器</b>（执行控制量）。RLS 就是辨识器的具体实现。</p>
+
+    <p><b>RLS 的本质</b>：批量最小二乘 $\hat\theta = (\Phi^T\Phi)^{-1}\Phi^T Y$ 的递推版本。利用矩阵求逆引理，每来一个新数据点只做增量更新，不重新解整个方程组：</p>
+    $$ \mathbf{K}(t) = \frac{\mathbf{P}(t-1)\varphi(t)}{\lambda + \varphi^T(t)\mathbf{P}(t-1)\varphi(t)} \tag{6.10}$$
+    $$ \hat\theta(t) = \hat\theta(t-1) + \mathbf{K}(t)\left[y(t) - \varphi^T(t)\hat\theta(t-1)\right] \tag{6.11}$$
+    $$ \mathbf{P}(t) = \frac{1}{\lambda}\left[\mathbf{P}(t-1) - \mathbf{K}(t)\varphi^T(t)\mathbf{P}(t-1)\right] \tag{6.12}$$
+    <p>其中 $\mathbf{P}(t)$ 是参数估计的协方差矩阵，$\lambda$ 是遗忘因子。</p>
+
+    <div class="def-box">
+      <div class="box-label">遗忘因子 λ 的作用</div>
+      <p>带遗忘因子的 RLS 等价于对历史数据指数加权：</p>
+      $$ \min_\theta \sum_{i=1}^{t} \lambda^{t-i} \left[y(i) - \varphi^T(i)\theta\right]^2 \tag{6.13}$$
+      <p>$\lambda < 1$ 时旧数据权重指数衰减，有效窗口 $N_\text{eff} = 1/(1-\lambda)$。$\lambda=0.995$ 对应 200 步有效窗口，适合水箱这种慢时变系统。</p>
+    </div>
+
+    <p><b>RLS 对 GPC 推导链的影响</b>：</p>
+    <p>教材 §5.2~§5.4 的 GPC 推导假设 $A, B$ 已知固定。引入 RLS 后，每步 $\hat\theta$ 更新，整个推导链都要重算：</p>
+
+    <table class="note-table">
+      <tr><th>推导步骤</th><th>固定参数 GPC</th><th>自校正 GPC（+RLS）</th></tr>
+      <tr><td>①构造 $\tilde A = A\Delta$</td><td>离线一次</td><td>每步用最新 $\hat a_1$ 重算</td></tr>
+      <tr><td>②丢番图递推（§5.3）</td><td>离线预计算 $F_j, G_j$</td><td>每步在线递推</td></tr>
+      <tr><td>③自由响应 $Y^1$（§5.4）</td><td>用固定 $F_j$ 计算</td><td>用当步 $F_j$ 计算</td></tr>
+      <tr><td>④控制律 $\delta$（§5.5）</td><td>用固定 $G_2$, denom</td><td>用当步 $G_2$, denom</td></tr>
+      <tr><td>⑤RLS 更新</td><td>无</td><td>用 $y(t)$ 更新 $\hat\theta$，供下步用</td></tr>
+    </table>
+
+    <div class="note-box">
+      <div class="box-label">为什么 RLS 更新放在控制律计算之后</div>
+      <p>控制律用的是"当前对系统的最佳估计"，然后施加控制量 $u(t)$，等到下一步观测到 $y(t+1)$ 后再更新参数。如果先更新参数再计算控制律，会用到还没发生的观测，逻辑上不对。</p>
+      <p>本实验的顺序：读 $y(t)$ → 用旧 $\hat\theta$ 算控制律 → 输出 $u(t)$ → 用 $y(t)$ 更新 $\hat\theta$ → 等待下一步。</p>
+    </div>
+  </div>
+</div>
+
+</main>
+<script>
+// sidebar.js — 侧边栏折叠 + 当前页高亮 + 状态持久化
+
+(function () {
+  const KEY = 'note-sidebar-hidden';
+
+  // 1. 折叠按钮行为
+  function wireToggle() {
+    const btn = document.querySelector('button.sidebar-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const hidden = document.body.classList.toggle('sidebar-hidden');
+      document.querySelector('aside.sidebar')?.classList.toggle('collapsed', hidden);
+      try { localStorage.setItem(KEY, hidden ? '1' : '0'); } catch (e) {}
+      btn.textContent = hidden ? '☰' : '×';
+      btn.title = hidden ? '展开目录' : '收起目录';
+    });
+    // 初始状态：从 localStorage 恢复
+    let hidden = false;
+    try { hidden = localStorage.getItem(KEY) === '1'; } catch (e) {}
+    if (hidden) {
+      document.body.classList.add('sidebar-hidden');
+      document.querySelector('aside.sidebar')?.classList.add('collapsed');
+      btn.textContent = '☰';
+      btn.title = '展开目录';
+    } else {
+      btn.textContent = '×';
+      btn.title = '收起目录';
+    }
+  }
+
+  // 2. 按当前 URL 高亮菜单项
+  function highlightCurrent() {
+    const path = location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('aside.sidebar a').forEach(a => {
+      const href = a.getAttribute('href');
+      if (href && href.split('#')[0] === path) a.classList.add('active');
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    wireToggle();
+    highlightCurrent();
+  });
+})();
+
+</script>
+</body>
+</html>

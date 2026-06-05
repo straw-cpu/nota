@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="mynotes:template" content="minimal_slide">
+<meta name="mynotes:theme" content="default">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>§1 系统辨识 · 水箱 GPC 实验</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']], tags: 'ams' },
+  options: { skipHtmlTags: ['script','noscript','style','textarea'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+/* =============================================================
+ *  theme.css  —  主题层：只管"视觉"（颜色、字体、圆角、阴影）
+ *  切换风格时只动这个文件；布局/交互在 layout.css，不改。
+ *  后续要做"蓝色学术风""暗色风""极简风"只需复制本文件改变量+框样式。
+ * ============================================================= */
+
+:root {
+  /* ── 色板 ── */
+  --accent-dark:  #a00000;   /* 主色（标题、边框、active） */
+  --accent-mid:   #c0392b;   /* 悬停、公式链接 */
+  --accent-pale:  #fdecec;   /* 定义框底色 */
+  --gray-bar:     #ededed;   /* slide header 灰条 */
+  --blue-pale:    #f0f6ff;   /* 备注框 */
+  --green-pale:   #f0fff4;   /* 例题框 */
+  --yellow-pale:  #fff8e6;   /* 思考题框 */
+
+  --border:       #d4d4d4;
+  --text:         #1a1a1a;
+  --muted:        #666;
+
+  --bg-page:      #f7f7f7;
+  --bg-card:      #fff;
+  --bg-sidebar:   #fafafa;
+
+  /* ── 字体 ── */
+  --font-main:    "PingFang SC", "Microsoft YaHei", "Liberation Serif", serif;
+  --font-mono:    "SFMono-Regular", Consolas, monospace;
+
+  /* ── 尺寸 ── */
+  --radius:       4px;
+  --radius-lg:    6px;
+  --shadow-card:  0 1px 3px rgba(0,0,0,.05);
+  --sidebar-w:    260px;
+}
+
+/* ── 顶部标题 slide ── */
+header.title-slide {
+  background: var(--bg-card);
+  border-bottom: 2px solid var(--accent-dark);
+}
+header.title-slide h1 { color: var(--accent-dark); }
+
+/* ── slide 卡片 ── */
+.slide {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+.slide-header {
+  background: var(--gray-bar);
+  border-bottom: 2px solid var(--accent-dark);
+  color: var(--accent-dark);
+}
+
+/* ── 要点列表三角 ── */
+ul.tri > li::before { color: var(--accent-dark); }
+
+/* ── 定义框（粉红） ── */
+.def-box {
+  background: var(--accent-pale);
+  border: 1px solid #e8b4b4;
+  border-radius: var(--radius);
+}
+.def-box .box-label { color: var(--accent-dark); }
+
+/* ── 备注框（浅蓝） ── */
+.note-box {
+  background: var(--blue-pale);
+  border-left: 3px solid #5a8ac0;
+}
+.note-box .box-label { color: #3a6a9a; }
+
+/* ── 例题框（浅绿） ── */
+.ex-box {
+  background: var(--green-pale);
+  border-left: 3px solid #2a9d5c;
+}
+.ex-box .box-label { color: #2a7a4a; }
+
+/* ── 思考题框（浅黄） ── */
+.ask-box {
+  background: var(--yellow-pale);
+  border-left: 3px solid #d97706;
+}
+.ask-box .box-label { color: #b8600a; }
+
+/* ── 公式链接（MathJax） ── */
+mjx-container a[href^="#mjx-eqn"],
+mjx-container a[href^="#mjx-eqn"]:visited {
+  color: var(--accent-mid);
+  text-decoration: none;
+}
+mjx-container a[href^="#mjx-eqn"]:hover { text-decoration: underline; }
+
+/* ── 侧边栏主题色 ── */
+aside.sidebar { background: var(--bg-sidebar); }
+aside.sidebar .sb-title { color: var(--accent-dark); }
+aside.sidebar a.active {
+  background: var(--accent-pale);
+  border-left-color: var(--accent-dark);
+  color: var(--accent-dark);
+}
+aside.sidebar a:hover { color: var(--accent-dark); }
+
+/* ── 节间导航按钮 ── */
+nav.section-nav a:hover {
+  color: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+/* ── 折叠按钮 ── */
+button.sidebar-toggle:hover {
+  background: var(--accent-pale);
+  color: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+/* =============================================================
+ *  layout.css  —  布局层：只管"骨架"（间距、位置、字号、打印）
+ *  所有颜色/主题相关样式在 theme.css。切主题时这里不动。
+ * ============================================================= */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-main);
+  background: var(--bg-page);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.75;
+}
+html { scroll-behavior: smooth; }
+mjx-container[display="true"] { scroll-margin-top: 70px; }
+
+/* ══════════ 侧边栏 ══════════ */
+aside.sidebar {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: var(--sidebar-w);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 18px 14px 24px;
+  font-size: 12.5px;
+  z-index: 100;
+  transition: transform 0.25s ease;
+}
+aside.sidebar.collapsed {
+  transform: translateX(calc(-1 * var(--sidebar-w)));
+}
+aside.sidebar .sb-title {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 8px 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+  padding-right: 32px;             /* 给右上角关闭按钮留位 */
+}
+aside.sidebar .sb-home {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 2px 8px 8px;
+}
+aside.sidebar ul { list-style: none; padding: 0; }
+aside.sidebar li { margin: 0; }
+aside.sidebar a {
+  display: block;
+  padding: 5px 10px;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 3px;
+  border-left: 2px solid transparent;
+  line-height: 1.5;
+}
+aside.sidebar a:hover { background: var(--bg-card); }
+aside.sidebar a.active { font-weight: 600; }
+aside.sidebar .sb-group {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 10px 10px 4px;
+  letter-spacing: 0.5px;
+}
+aside.sidebar ul.sub { padding-left: 14px; margin: 2px 0 4px; }
+aside.sidebar ul.sub a {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 2px 8px;
+}
+
+/* ══════════ 折叠按钮 ══════════ */
+button.sidebar-toggle {
+  position: fixed;
+  top: 14px;
+  z-index: 200;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--muted);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 14px;
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: left 0.25s ease, right 0.25s ease;
+  padding: 0;
+  line-height: 1;
+}
+/* 侧边栏展开：按钮贴在侧边栏右上角内 */
+button.sidebar-toggle {
+  left: calc(var(--sidebar-w) - 36px);
+}
+/* 侧边栏收起：按钮贴到页面左上角 */
+body.sidebar-hidden button.sidebar-toggle {
+  left: 14px;
+}
+
+/* ══════════ 主体 ══════════ */
+main.with-sidebar {
+  margin-left: var(--sidebar-w);
+  max-width: 880px;
+  padding: 28px 24px 60px 34px;
+  transition: margin-left 0.25s ease;
+}
+body.sidebar-hidden main.with-sidebar {
+  margin-left: 0;
+  max-width: 1000px;
+  margin-right: auto;
+  padding-left: 60px;              /* 为按钮腾点空间 */
+}
+
+/* ══════════ 窄屏 ══════════ */
+@media (max-width: 900px) {
+  aside.sidebar {
+    position: fixed;
+    width: 80vw;
+    max-width: 300px;
+    box-shadow: 2px 0 12px rgba(0,0,0,.1);
+  }
+  main.with-sidebar { margin-left: 0; padding: 20px; }
+  body:not(.sidebar-hidden) button.sidebar-toggle { left: calc(80vw - 36px); }
+  /* 窄屏默认收起 */
+  aside.sidebar:not(.forced-open) { transform: translateX(-100%); }
+  body.sidebar-hidden aside.sidebar { transform: translateX(-100%); }
+}
+
+/* ══════════ 标题 slide ══════════ */
+header.title-slide {
+  padding: 36px 40px 26px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+header.title-slide h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+header.title-slide .subtitle {
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+header.title-slide .meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ══════════ Slide 卡片 ══════════ */
+.slide {
+  margin-bottom: 22px;
+  overflow: hidden;
+}
+.slide-header {
+  padding: 10px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.slide-header .pdf-ref {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+.slide-body { padding: 18px 28px 22px; }
+.slide-body > * + * { margin-top: 10px; }
+
+/* ══════════ 三角要点 ══════════ */
+ul.tri { list-style: none; padding-left: 4px; }
+ul.tri > li { position: relative; padding-left: 22px; margin-bottom: 6px; }
+ul.tri > li::before {
+  content: "▸";
+  position: absolute; left: 2px; top: 0;
+  font-size: 13px;
+}
+ul.tri ul.dash { list-style: none; padding-left: 10px; margin-top: 4px; }
+ul.tri ul.dash > li {
+  position: relative; padding-left: 14px;
+  color: var(--muted); font-size: 13.5px;
+}
+ul.tri ul.dash > li::before { content: "–"; position: absolute; left: 0; }
+
+/* ══════════ 定义/备注/例题/思考 框（布局共性） ══════════ */
+.def-box  { padding: 14px 18px; margin: 10px 0; }
+.note-box { padding: 10px 14px; font-size: 13.5px; border-radius: 0 var(--radius) var(--radius) 0; }
+.ex-box   { padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0; }
+.ask-box  { padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0; }
+.def-box .box-label,
+.note-box .box-label,
+.ex-box .box-label,
+.ask-box .box-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+.def-box .box-label { letter-spacing: 0.6px; margin-bottom: 6px; }
+
+/* ══════════ 公式居中 ══════════ */
+.formula { text-align: center; padding: 6px 0; overflow-x: auto; }
+
+/* ══════════ 推导折叠 ══════════ */
+details.derive {
+  background: #fafafa;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-top: 10px;
+}
+details.derive summary {
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-weight: 600;
+  user-select: none;
+}
+details.derive .derive-body { padding: 8px 16px 14px; font-size: 13.5px; }
+
+/* ══════════ 节间导航 ══════════ */
+nav.section-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+nav.section-nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+}
+nav.section-nav a.disabled { color: #ccc; pointer-events: none; background: #f5f5f5; }
+
+/* ══════════ 页脚 ══════════ */
+footer.page-end {
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 30px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+/* ══════════ 打印 ══════════ */
+@media print {
+  @page { size: 13.333in 7.5in; margin: 0.5in 0.55in 0.55in; }
+  html, body { background: #fff !important; font-size: 15.5px; line-height: 1.85; }
+  aside.sidebar, button.sidebar-toggle { display: none; }
+  main.with-sidebar { margin-left: 0; max-width: none; padding: 0; }
+  header.title-slide, .slide {
+    page-break-before: always; break-before: page;
+  }
+  header.title-slide:first-child { page-break-before: auto; break-before: auto; }
+  .slide-header { page-break-after: avoid; break-after: avoid-page; }
+  .def-box, .note-box, .ex-box, .ask-box, .formula { page-break-inside: avoid; break-inside: avoid-page; }
+  .slide { border: 1px solid #999; box-shadow: none; margin: 0; }
+  .slide-header {
+    background: #ededed !important; font-size: 20px; padding: 14px 28px;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .def-box, .note-box, .ex-box, .ask-box, .slide-header {
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  nav.section-nav { display: none; }
+}
+
+/* ══════════ 三档详细程度折叠 ══════════
+ *  ★ 核心  → def-box（红框，完整展示）
+ *  ▷ 推导  → details.derive（灰色折叠，默认收起）
+ *  ○ 背景  → .bg-note（浅灰文字，无框）
+ * ============================================ */
+
+/* 推导折叠：已在上方定义 details.derive，此处补充三档标记 */
+details.derive[open] > summary { color: var(--accent-dark); }
+details.derive summary::marker { content: ""; }
+details.derive summary::-webkit-details-marker { display: none; }
+
+/* 背景说明（○ 档） */
+.bg-note {
+  font-size: 13px;
+  color: var(--muted);
+  padding: 4px 0 4px 14px;
+  border-left: 2px solid var(--border);
+  margin: 6px 0;
+}
+
+/* 难度标签 */
+.tag-core  { display:inline-block; font-size:10px; font-weight:700; padding:1px 6px; border-radius:3px; background:var(--accent-pale); color:var(--accent-dark); margin-right:6px; vertical-align:middle; }
+.tag-deriv { display:inline-block; font-size:10px; font-weight:700; padding:1px 6px; border-radius:3px; background:#f5f5f5; color:#666; margin-right:6px; vertical-align:middle; }
+.tag-bg    { display:inline-block; font-size:10px; font-weight:700; padding:1px 6px; border-radius:3px; background:#f0f6ff; color:#3a6ea5; margin-right:6px; vertical-align:middle; }
+
+/* ▷ 推导折叠块内容区 */
+details.derive summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: #888;
+  padding: 6px 0;
+  user-select: none;
+  list-style: none;
+}
+details.derive summary:hover { color: var(--accent-dark); }
+details.derive .derive-body {
+  padding: 12px 16px;
+  background: #f8f8f8;
+  border-left: 3px solid #d0d0d0;
+  border-radius: 0 4px 4px 0;
+  font-size: 13px;
+  line-height: 1.8;
+  margin-top: 4px;
+}
+details.derive .derive-body p { margin: 6px 0; }
+
+/* nav 禁用态 */
+nav.section-nav a.disabled {
+  color: var(--muted);
+  pointer-events: none;
+  cursor: default;
+  border-color: transparent;
+}
+
+/* GPC 推导步骤小标题 */
+h2.step {
+  font-size: 13px;
+  color: var(--accent-dark);
+  margin: 14px 0 8px;
+  font-weight: 700;
+}
+
+/* pre 窄屏防溢出 */
+.slide-body pre { overflow-x: auto; white-space: pre; }
+
+/* ══════════ 公式交叉超链接 ══════════ */
+a.eq-ref {
+  color: var(--accent-mid);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px dashed var(--accent-mid);
+  font-size: 0.95em;
+}
+a.eq-ref:hover { color: var(--accent-dark); border-bottom-style: solid; }
+
+/* 公式锚点高亮（被跳转时） */
+.formula:target, mjx-container:target {
+  background: #fff8e6;
+  border-radius: 4px;
+  outline: 2px solid #f0c040;
+  outline-offset: 4px;
+}
+
+/* ══════════ 表格 ══════════ */
+table.note-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 10px 0;
+}
+table.note-table th {
+  background: var(--accent-pale);
+  border: 1px solid var(--border);
+  padding: 7px 12px;
+  text-align: left;
+  font-weight: 700;
+}
+table.note-table td {
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  vertical-align: top;
+}
+table.note-table tr:nth-child(even) td { background: #fafafa; }
+
+mjx-container, .MathJax { text-transform: none !important; }
+</style>
+</head>
+<body>
+<button class="sidebar-toggle" type="button" aria-label="切换目录">×</button>
+<aside class="sidebar">
+  <div class="sb-title">水箱 GPC 实验笔记</div>
+  <a class="sb-home" href="index.html">▣ 返回总目录</a>
+  <div class="sb-group">§1 系统辨识（当前）</div>
+  <ul>
+    <li><a href="#s1">1. 数据与信号链</a></li>
+    <li><a href="#s2">2. ARX 模型结构</a></li>
+    <li><a href="#s3">3. 时延估计</a></li>
+    <li><a href="#s4">4. AIC 阶次选择</a></li>
+    <li><a href="#s5">5. 最小二乘辨识</a></li>
+    <li><a href="#s6">6. 归一化空间重辨识</a></li>
+    <li><a href="#s7">7. 辨识结果汇总</a></li>
+    <li><a href="#s8">8. 踩坑：符号约定</a></li>
+  </ul>
+  <div class="sb-group">其他章节</div>
+  <ul>
+    <li><a href="s2_CARIMA与丢番图.html">§2 CARIMA 与丢番图递推</a></li>
+    <li><a href="s3_GPC控制律.html">§3 GPC 控制律</a></li>
+    <li><a href="s4_RLS在线辨识.html">§4 RLS 在线辨识</a></li>
+    <li><a href="s5_调参指南.html">§5 调参指南</a></li>
+    <li><a href="s6_补充.html">§6 补充答疑</a></li>
+    <li><a href="s7_代码对照.html">§7 代码对照</a></li>
+  </ul>
+</aside>
+<main class="with-sidebar">
+<header class="title-slide">
+  <h1>§1 &nbsp;系统辨识</h1>
+  <div class="subtitle">ARX 模型 · 时延估计 · AIC 阶次选择 · 归一化空间辨识</div>
+  <div class="meta">水箱液位控制实验 · 数据文件 6_517_1.txt（1944点）</div>
+</header>
+
+<div class="slide" id="s1">
+  <div class="slide-header"><span>1. 数据与信号链</span></div>
+  <div class="slide-body">
+    <span class="tag-bg">○ 背景</span>
+    <p>实验数据来自真实水箱，采样周期 1s，共 1944 点。信号链如下：</p>
+    <table class="note-table">
+      <tr><th>信号</th><th>物理量</th><th>范围</th><th>归一化</th></tr>
+      <tr><td>输出 $y$</td><td>水位传感器电压</td><td>1.0 ~ 4.634 V</td><td>$(y - 1.0) / 3.634 \to [0,1]$</td></tr>
+      <tr><td>输入 $u$</td><td>泵驱动电流</td><td>4 ~ 20 mA</td><td>$(u - 4.0) / 16.0 \to [0,1]$</td></tr>
+      <tr><td>设定值 SP</td><td>目标水位</td><td>1.0 ~ 4.634 V</td><td>同 $y$</td></tr>
+    </table>
+    <div class="note-box">
+      <div class="box-label">为什么要归一化</div>
+      辨识数据的原始单位是 % 和 V，量纲不同。在归一化空间辨识，$B$ 系数的物理含义是"单位归一化控制量对归一化输出的稳态增益"，数值在合理范围（0.01~0.1），不会因量纲差异导致数值病态。
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s2">
+  <div class="slide-header"><span>2. ARX 模型结构</span></div>
+  <div class="slide-body">
+    <span class="tag-core">★ 核心</span>
+    <p>ARX（AutoRegressive with eXogenous input）模型：</p>
+    $$ A(q^{-1})\, y_t = B(q^{-1})\, u_{t-k} + e_t \tag{1.1}$$
+    $$ A(q^{-1}) = 1 + a_1 q^{-1} + \cdots + a_{n_a} q^{-n_a}, \quad B(q^{-1}) = b_0 + b_1 q^{-1} + \cdots + b_{n_b} q^{-n_b}$$
+    <ul class="tri">
+      <li>$k$：纯时延（整数采样步），水箱系统约 24 步 = 24s</li>
+      <li>$n_a$：AR 阶次，决定系统极点数量</li>
+      <li>$n_b$：MA 阶次，本实验 $n_b=0$（只有 $b_0$）</li>
+    </ul>
+    <p>展开后的仿真方程（$n_a=1, n_b=0$）：</p>
+    $$ y(t) = -a_1\, y(t-1) + b_0\, u(t-k) \tag{1.2}$$
+    <div class="def-box">
+      <div class="box-label">符号约定（重要！）</div>
+      $A = [1, a_1]$ 中 $a_1 < 0$（如 $a_1 = -0.9846$），则极点在 $+0.9846$（稳定）。<br>
+      仿真方程里系数是 $-a_1 = +0.9846$（正号）。<br>
+      <b>辨识出的 $a_1$ 是负值，仿真时取负号变正号，两者不要混淆。</b>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s3">
+  <div class="slide-header"><span>3. 时延估计</span></div>
+  <div class="slide-body">
+    <span class="tag-bg">○ 方法</span>
+    <p>对辨识数据中的多段阶跃激励，用"稳定性检验 + 局部噪声阈值"方法检测响应起点：</p>
+    <table class="note-table">
+      <tr><th>阶跃时刻</th><th>检测到的 $k$</th><th>状态</th></tr>
+      <tr><td>t = 97</td><td>26</td><td>✅ 有效</td></tr>
+      <tr><td>t = 1744</td><td>21</td><td>✅ 有效</td></tr>
+      <tr><td>其余 4 段</td><td>—</td><td>未稳定，跳过</td></tr>
+    </table>
+    <p>有效段均值 $k = 23.5$，取整 $\boxed{k = 24}$ 步。</p>
+  </div>
+</div>
+
+<div class="slide" id="s4">
+  <div class="slide-header"><span>4. AIC 阶次选择</span></div>
+  <div class="slide-body">
+    <span class="tag-core">★ 核心</span>
+    <p>固定 $k=24$，搜索 $n_a \in [1,4]$，$n_b \in [0,3]$，用 AIC 准则选最优阶次：</p>
+    $$ \text{AIC} = N \ln(\hat\sigma_e^2) + 2(n_a + n_b + 1) \tag{1.3}$$
+    <table class="note-table">
+      <tr><th></th><th>$n_b=0$</th><th>$n_b=1$</th><th>$n_b=2$</th></tr>
+      <tr><td>$n_a=1$</td><td>−21452</td><td>−21442</td><td>−21429</td></tr>
+      <tr><td>$n_a=2$</td><td>−21664</td><td>−21652</td><td>−21640</td></tr>
+      <tr><td>$n_a=4$ ★</td><td><b>−21843</b></td><td>−21829</td><td>−21822</td></tr>
+    </table>
+    <p>AIC 最优：$n_a=4, n_b=0$。但 GPC 实验选用 $n_a=1$（更简单，便于调试）。</p>
+    <div class="note-box">
+      <div class="box-label">为什么不用 AIC 最优的 na=4</div>
+      na=4 精度最高，但 GPC 的丢番图递推复杂度随 $n_a$ 增加，C++ 实现更难调试。na=1 的 RMSE=0.0164V，na=4 的 RMSE=0.0068V，差距约 2.4 倍，但对控制器来说 RLS 在线更新可以弥补模型误差。
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s5">
+  <div class="slide-header"><span>5. 最小二乘辨识</span></div>
+  <div class="slide-body">
+    <span class="tag-core">★ 核心</span>
+    <p>构建回归矩阵 $\Phi$ 和输出向量 $Y$：</p>
+    $$ \varphi(t) = [-y(t-1),\, u(t-k)]^T \quad (n_a=1, n_b=0) \tag{1.4}$$
+    $$ Y = \Phi\,\theta + e, \quad \hat\theta = (\Phi^T\Phi)^{-1}\Phi^T Y \tag{1.5}$$
+    <p>注意 $\varphi(t)$ 的第一项是 $-y(t-1)$（负号），所以辨识出的 $\theta_0 = a_1 > 0$，而 $A = [1, -\theta_0]$，即 $A[1] < 0$。</p>
+    <div class="def-box">
+      <div class="box-label">代码对应（identify_arx.py）</div>
+      <pre style="font-size:0.85em; margin:0">
+def build_regression(y, u, na, nb, k):
+    for j in range(na):
+        Phi[i, j] = -y[t-1-j]   # 负号！
+    for j in range(nb+1):
+        Phi[i, na+j] = u[t-k-j]
+
+A = np.concatenate([[1], theta[:na]])  # A[1] = theta[0] < 0
+      </pre>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s6">
+  <div class="slide-header"><span>6. 归一化空间重辨识</span></div>
+  <div class="slide-body">
+    <span class="tag-core">★ 核心（踩坑修复）</span>
+    <p>第一次实验直接用原始物理量辨识的系数，导致控制量持续饱和。根本原因：</p>
+    $$ \frac{dy_\text{norm}}{du_\text{norm}} = \frac{dy}{du} \cdot \frac{U_\text{range}}{Y_\text{range}} \tag{1.6}$$
+    <p>原始空间的 $b_0$ 乘以 $U_\text{range}/Y_\text{range} = 16/3.634 \approx 4.4$ 才是归一化空间的 $b_0$。<b>必须在归一化空间重新跑最小二乘。</b></p>
+    <table class="note-table">
+      <tr><th>辨识空间</th><th>$a_1$</th><th>$b_0$</th><th>稳态增益 $K_{ss}$</th><th>到达 3V 需要 $u$</th></tr>
+      <tr><td>原始物理量</td><td>−0.9846</td><td>0.0055</td><td>0.357</td><td>28.6 mA ❌ 超限</td></tr>
+      <tr><td><b>归一化空间</b></td><td>−0.9846</td><td><b>0.02436</b></td><td>1.577</td><td>9.6 mA ✅</td></tr>
+    </table>
+    <div class="note-box">
+      <div class="box-label">稳态增益计算</div>
+      $n_a=1$ 时：$K_{ss} = b_0 / (1 + a_1)$（注意 $a_1 < 0$，分母 $= 1 - |a_1|$）
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s7">
+  <div class="slide-header"><span>7. 辨识结果汇总</span></div>
+  <div class="slide-body">
+    <table class="note-table">
+      <tr><th>参数</th><th>值</th><th>说明</th></tr>
+      <tr><td>$n_a$</td><td>1</td><td>一阶系统，单极点</td></tr>
+      <tr><td>$n_b$</td><td>0</td><td>无 MA 项</td></tr>
+      <tr><td>$k$</td><td>24</td><td>纯时延 24 步 = 24s</td></tr>
+      <tr><td>$a_1$</td><td>−0.984555</td><td>极点在 +0.9846，时间常数 $\tau \approx 64$ 步</td></tr>
+      <tr><td>$b_0$</td><td>0.024361</td><td>归一化空间，稳态增益 $K_{ss} = 1.577$</td></tr>
+      <tr><td>验证 RMSE</td><td>0.0164 V</td><td>用辨识数据后半段验证</td></tr>
+    </table>
+    <p>仿真方程（偏差量，归一化空间）：</p>
+    $$ y(t) = 0.984555\, y(t-1) + 0.024361\, u(t-24) \tag{1.7}$$
+  </div>
+</div>
+
+<div class="slide" id="s8">
+  <div class="slide-header"><span>8. 踩坑：符号约定一致性</span></div>
+  <div class="slide-body">
+    <span class="tag-bg">⚠ 易错点</span>
+    <p>辨识、仿真、RLS 三处的符号约定必须一致，否则参数漂移或控制失效：</p>
+    <table class="note-table">
+      <tr><th>位置</th><th>方程形式</th><th>$a_1$ 的符号</th></tr>
+      <tr><td>辨识（build_regression）</td><td>$\varphi = [-y(t-1), u(t-k)]$，$y = \theta_0 \cdot (-y(t-1)) + \theta_1 \cdot u$</td><td>$\theta_0 = |a_1| > 0$，$A[1] = -\theta_0 < 0$</td></tr>
+      <tr><td>仿真（ARX 模型）</td><td>$y(t) = -A[1] \cdot y(t-1) + B[0] \cdot u(t-k)$</td><td>$-A[1] = +0.9846 > 0$</td></tr>
+      <tr><td>RLS 更新</td><td>$\varphi = [y(t-1), u(t-k)]$，$\hat y = \theta_0 \cdot y(t-1) + \theta_1 \cdot u$</td><td>$\theta_0 = -A[1] = +0.9846 > 0$</td></tr>
+    </table>
+    <div class="def-box">
+      <div class="box-label">结论</div>
+      RLS 里存的 <code>rls_a1 = 0.984555</code>（正值），对应仿真方程里 $y(t) = \text{rls\_a1} \cdot y(t-1) + \text{rls\_b0} \cdot u(t-k)$。<br>
+      CARIMA 构造时：$A = [1, -\text{rls\_a1}]$，$A\_\text{tilde} = [1,\ -\text{rls\_a1}-1,\ \text{rls\_a1}]$。
+    </div>
+  </div>
+</div>
+
+</main>
+<script>
+// sidebar.js — 侧边栏折叠 + 当前页高亮 + 状态持久化
+
+(function () {
+  const KEY = 'note-sidebar-hidden';
+
+  // 1. 折叠按钮行为
+  function wireToggle() {
+    const btn = document.querySelector('button.sidebar-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const hidden = document.body.classList.toggle('sidebar-hidden');
+      document.querySelector('aside.sidebar')?.classList.toggle('collapsed', hidden);
+      try { localStorage.setItem(KEY, hidden ? '1' : '0'); } catch (e) {}
+      btn.textContent = hidden ? '☰' : '×';
+      btn.title = hidden ? '展开目录' : '收起目录';
+    });
+    // 初始状态：从 localStorage 恢复
+    let hidden = false;
+    try { hidden = localStorage.getItem(KEY) === '1'; } catch (e) {}
+    if (hidden) {
+      document.body.classList.add('sidebar-hidden');
+      document.querySelector('aside.sidebar')?.classList.add('collapsed');
+      btn.textContent = '☰';
+      btn.title = '展开目录';
+    } else {
+      btn.textContent = '×';
+      btn.title = '收起目录';
+    }
+  }
+
+  // 2. 按当前 URL 高亮菜单项
+  function highlightCurrent() {
+    const path = location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('aside.sidebar a').forEach(a => {
+      const href = a.getAttribute('href');
+      if (href && href.split('#')[0] === path) a.classList.add('active');
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    wireToggle();
+    highlightCurrent();
+  });
+})();
+
+</script>
+</body>
+</html>

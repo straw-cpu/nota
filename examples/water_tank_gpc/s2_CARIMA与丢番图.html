@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="mynotes:template" content="minimal_slide">
+<meta name="mynotes:theme" content="default">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>§2 CARIMA 与丢番图递推 · 水箱 GPC 实验</title>
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']], tags: 'ams' },
+  options: { skipHtmlTags: ['script','noscript','style','textarea'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<style>
+/* =============================================================
+ *  theme.css  —  主题层：只管"视觉"（颜色、字体、圆角、阴影）
+ *  切换风格时只动这个文件；布局/交互在 layout.css，不改。
+ *  后续要做"蓝色学术风""暗色风""极简风"只需复制本文件改变量+框样式。
+ * ============================================================= */
+
+:root {
+  /* ── 色板 ── */
+  --accent-dark:  #a00000;   /* 主色（标题、边框、active） */
+  --accent-mid:   #c0392b;   /* 悬停、公式链接 */
+  --accent-pale:  #fdecec;   /* 定义框底色 */
+  --gray-bar:     #ededed;   /* slide header 灰条 */
+  --blue-pale:    #f0f6ff;   /* 备注框 */
+  --green-pale:   #f0fff4;   /* 例题框 */
+  --yellow-pale:  #fff8e6;   /* 思考题框 */
+
+  --border:       #d4d4d4;
+  --text:         #1a1a1a;
+  --muted:        #666;
+
+  --bg-page:      #f7f7f7;
+  --bg-card:      #fff;
+  --bg-sidebar:   #fafafa;
+
+  /* ── 字体 ── */
+  --font-main:    "PingFang SC", "Microsoft YaHei", "Liberation Serif", serif;
+  --font-mono:    "SFMono-Regular", Consolas, monospace;
+
+  /* ── 尺寸 ── */
+  --radius:       4px;
+  --radius-lg:    6px;
+  --shadow-card:  0 1px 3px rgba(0,0,0,.05);
+  --sidebar-w:    260px;
+}
+
+/* ── 顶部标题 slide ── */
+header.title-slide {
+  background: var(--bg-card);
+  border-bottom: 2px solid var(--accent-dark);
+}
+header.title-slide h1 { color: var(--accent-dark); }
+
+/* ── slide 卡片 ── */
+.slide {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+.slide-header {
+  background: var(--gray-bar);
+  border-bottom: 2px solid var(--accent-dark);
+  color: var(--accent-dark);
+}
+
+/* ── 要点列表三角 ── */
+ul.tri > li::before { color: var(--accent-dark); }
+
+/* ── 定义框（粉红） ── */
+.def-box {
+  background: var(--accent-pale);
+  border: 1px solid #e8b4b4;
+  border-radius: var(--radius);
+}
+.def-box .box-label { color: var(--accent-dark); }
+
+/* ── 备注框（浅蓝） ── */
+.note-box {
+  background: var(--blue-pale);
+  border-left: 3px solid #5a8ac0;
+}
+.note-box .box-label { color: #3a6a9a; }
+
+/* ── 例题框（浅绿） ── */
+.ex-box {
+  background: var(--green-pale);
+  border-left: 3px solid #2a9d5c;
+}
+.ex-box .box-label { color: #2a7a4a; }
+
+/* ── 思考题框（浅黄） ── */
+.ask-box {
+  background: var(--yellow-pale);
+  border-left: 3px solid #d97706;
+}
+.ask-box .box-label { color: #b8600a; }
+
+/* ── 公式链接（MathJax） ── */
+mjx-container a[href^="#mjx-eqn"],
+mjx-container a[href^="#mjx-eqn"]:visited {
+  color: var(--accent-mid);
+  text-decoration: none;
+}
+mjx-container a[href^="#mjx-eqn"]:hover { text-decoration: underline; }
+
+/* ── 侧边栏主题色 ── */
+aside.sidebar { background: var(--bg-sidebar); }
+aside.sidebar .sb-title { color: var(--accent-dark); }
+aside.sidebar a.active {
+  background: var(--accent-pale);
+  border-left-color: var(--accent-dark);
+  color: var(--accent-dark);
+}
+aside.sidebar a:hover { color: var(--accent-dark); }
+
+/* ── 节间导航按钮 ── */
+nav.section-nav a:hover {
+  color: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+/* ── 折叠按钮 ── */
+button.sidebar-toggle:hover {
+  background: var(--accent-pale);
+  color: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+/* =============================================================
+ *  layout.css  —  布局层：只管"骨架"（间距、位置、字号、打印）
+ *  所有颜色/主题相关样式在 theme.css。切主题时这里不动。
+ * ============================================================= */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-main);
+  background: var(--bg-page);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.75;
+}
+html { scroll-behavior: smooth; }
+mjx-container[display="true"] { scroll-margin-top: 70px; }
+
+/* ══════════ 侧边栏 ══════════ */
+aside.sidebar {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: var(--sidebar-w);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 18px 14px 24px;
+  font-size: 12.5px;
+  z-index: 100;
+  transition: transform 0.25s ease;
+}
+aside.sidebar.collapsed {
+  transform: translateX(calc(-1 * var(--sidebar-w)));
+}
+aside.sidebar .sb-title {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 8px 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+  padding-right: 32px;             /* 给右上角关闭按钮留位 */
+}
+aside.sidebar .sb-home {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 2px 8px 8px;
+}
+aside.sidebar ul { list-style: none; padding: 0; }
+aside.sidebar li { margin: 0; }
+aside.sidebar a {
+  display: block;
+  padding: 5px 10px;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 3px;
+  border-left: 2px solid transparent;
+  line-height: 1.5;
+}
+aside.sidebar a:hover { background: var(--bg-card); }
+aside.sidebar a.active { font-weight: 600; }
+aside.sidebar .sb-group {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  padding: 10px 10px 4px;
+  letter-spacing: 0.5px;
+}
+aside.sidebar ul.sub { padding-left: 14px; margin: 2px 0 4px; }
+aside.sidebar ul.sub a {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 2px 8px;
+}
+
+/* ══════════ 折叠按钮 ══════════ */
+button.sidebar-toggle {
+  position: fixed;
+  top: 14px;
+  z-index: 200;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--muted);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 14px;
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: left 0.25s ease, right 0.25s ease;
+  padding: 0;
+  line-height: 1;
+}
+/* 侧边栏展开：按钮贴在侧边栏右上角内 */
+button.sidebar-toggle {
+  left: calc(var(--sidebar-w) - 36px);
+}
+/* 侧边栏收起：按钮贴到页面左上角 */
+body.sidebar-hidden button.sidebar-toggle {
+  left: 14px;
+}
+
+/* ══════════ 主体 ══════════ */
+main.with-sidebar {
+  margin-left: var(--sidebar-w);
+  max-width: 880px;
+  padding: 28px 24px 60px 34px;
+  transition: margin-left 0.25s ease;
+}
+body.sidebar-hidden main.with-sidebar {
+  margin-left: 0;
+  max-width: 1000px;
+  margin-right: auto;
+  padding-left: 60px;              /* 为按钮腾点空间 */
+}
+
+/* ══════════ 窄屏 ══════════ */
+@media (max-width: 900px) {
+  aside.sidebar {
+    position: fixed;
+    width: 80vw;
+    max-width: 300px;
+    box-shadow: 2px 0 12px rgba(0,0,0,.1);
+  }
+  main.with-sidebar { margin-left: 0; padding: 20px; }
+  body:not(.sidebar-hidden) button.sidebar-toggle { left: calc(80vw - 36px); }
+  /* 窄屏默认收起 */
+  aside.sidebar:not(.forced-open) { transform: translateX(-100%); }
+  body.sidebar-hidden aside.sidebar { transform: translateX(-100%); }
+}
+
+/* ══════════ 标题 slide ══════════ */
+header.title-slide {
+  padding: 36px 40px 26px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+header.title-slide h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+header.title-slide .subtitle {
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+header.title-slide .meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ══════════ Slide 卡片 ══════════ */
+.slide {
+  margin-bottom: 22px;
+  overflow: hidden;
+}
+.slide-header {
+  padding: 10px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.slide-header .pdf-ref {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+.slide-body { padding: 18px 28px 22px; }
+.slide-body > * + * { margin-top: 10px; }
+
+/* ══════════ 三角要点 ══════════ */
+ul.tri { list-style: none; padding-left: 4px; }
+ul.tri > li { position: relative; padding-left: 22px; margin-bottom: 6px; }
+ul.tri > li::before {
+  content: "▸";
+  position: absolute; left: 2px; top: 0;
+  font-size: 13px;
+}
+ul.tri ul.dash { list-style: none; padding-left: 10px; margin-top: 4px; }
+ul.tri ul.dash > li {
+  position: relative; padding-left: 14px;
+  color: var(--muted); font-size: 13.5px;
+}
+ul.tri ul.dash > li::before { content: "–"; position: absolute; left: 0; }
+
+/* ══════════ 定义/备注/例题/思考 框（布局共性） ══════════ */
+.def-box  { padding: 14px 18px; margin: 10px 0; }
+.note-box { padding: 10px 14px; font-size: 13.5px; border-radius: 0 var(--radius) var(--radius) 0; }
+.ex-box   { padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0; }
+.ask-box  { padding: 12px 16px; border-radius: 0 var(--radius) var(--radius) 0; }
+.def-box .box-label,
+.note-box .box-label,
+.ex-box .box-label,
+.ask-box .box-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+.def-box .box-label { letter-spacing: 0.6px; margin-bottom: 6px; }
+
+/* ══════════ 公式居中 ══════════ */
+.formula { text-align: center; padding: 6px 0; overflow-x: auto; }
+
+/* ══════════ 推导折叠 ══════════ */
+details.derive {
+  background: #fafafa;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-top: 10px;
+}
+details.derive summary {
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-weight: 600;
+  user-select: none;
+}
+details.derive .derive-body { padding: 8px 16px 14px; font-size: 13.5px; }
+
+/* ══════════ 节间导航 ══════════ */
+nav.section-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+nav.section-nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+}
+nav.section-nav a.disabled { color: #ccc; pointer-events: none; background: #f5f5f5; }
+
+/* ══════════ 页脚 ══════════ */
+footer.page-end {
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 30px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+/* ══════════ 打印 ══════════ */
+@media print {
+  @page { size: 13.333in 7.5in; margin: 0.5in 0.55in 0.55in; }
+  html, body { background: #fff !important; font-size: 15.5px; line-height: 1.85; }
+  aside.sidebar, button.sidebar-toggle { display: none; }
+  main.with-sidebar { margin-left: 0; max-width: none; padding: 0; }
+  header.title-slide, .slide {
+    page-break-before: always; break-before: page;
+  }
+  header.title-slide:first-child { page-break-before: auto; break-before: auto; }
+  .slide-header { page-break-after: avoid; break-after: avoid-page; }
+  .def-box, .note-box, .ex-box, .ask-box, .formula { page-break-inside: avoid; break-inside: avoid-page; }
+  .slide { border: 1px solid #999; box-shadow: none; margin: 0; }
+  .slide-header {
+    background: #ededed !important; font-size: 20px; padding: 14px 28px;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .def-box, .note-box, .ex-box, .ask-box, .slide-header {
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  nav.section-nav { display: none; }
+}
+
+/* ══════════ 三档详细程度折叠 ══════════
+ *  ★ 核心  → def-box（红框，完整展示）
+ *  ▷ 推导  → details.derive（灰色折叠，默认收起）
+ *  ○ 背景  → .bg-note（浅灰文字，无框）
+ * ============================================ */
+
+/* 推导折叠：已在上方定义 details.derive，此处补充三档标记 */
+details.derive[open] > summary { color: var(--accent-dark); }
+details.derive summary::marker { content: ""; }
+details.derive summary::-webkit-details-marker { display: none; }
+
+/* 背景说明（○ 档） */
+.bg-note {
+  font-size: 13px;
+  color: var(--muted);
+  padding: 4px 0 4px 14px;
+  border-left: 2px solid var(--border);
+  margin: 6px 0;
+}
+
+/* 难度标签 */
+.tag-core  { display:inline-block; font-size:10px; font-weight:700; padding:1px 6px; border-radius:3px; background:var(--accent-pale); color:var(--accent-dark); margin-right:6px; vertical-align:middle; }
+.tag-deriv { display:inline-block; font-size:10px; font-weight:700; padding:1px 6px; border-radius:3px; background:#f5f5f5; color:#666; margin-right:6px; vertical-align:middle; }
+.tag-bg    { display:inline-block; font-size:10px; font-weight:700; padding:1px 6px; border-radius:3px; background:#f0f6ff; color:#3a6ea5; margin-right:6px; vertical-align:middle; }
+
+/* ▷ 推导折叠块内容区 */
+details.derive summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: #888;
+  padding: 6px 0;
+  user-select: none;
+  list-style: none;
+}
+details.derive summary:hover { color: var(--accent-dark); }
+details.derive .derive-body {
+  padding: 12px 16px;
+  background: #f8f8f8;
+  border-left: 3px solid #d0d0d0;
+  border-radius: 0 4px 4px 0;
+  font-size: 13px;
+  line-height: 1.8;
+  margin-top: 4px;
+}
+details.derive .derive-body p { margin: 6px 0; }
+
+/* nav 禁用态 */
+nav.section-nav a.disabled {
+  color: var(--muted);
+  pointer-events: none;
+  cursor: default;
+  border-color: transparent;
+}
+
+/* GPC 推导步骤小标题 */
+h2.step {
+  font-size: 13px;
+  color: var(--accent-dark);
+  margin: 14px 0 8px;
+  font-weight: 700;
+}
+
+/* pre 窄屏防溢出 */
+.slide-body pre { overflow-x: auto; white-space: pre; }
+
+/* ══════════ 公式交叉超链接 ══════════ */
+a.eq-ref {
+  color: var(--accent-mid);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px dashed var(--accent-mid);
+  font-size: 0.95em;
+}
+a.eq-ref:hover { color: var(--accent-dark); border-bottom-style: solid; }
+
+/* 公式锚点高亮（被跳转时） */
+.formula:target, mjx-container:target {
+  background: #fff8e6;
+  border-radius: 4px;
+  outline: 2px solid #f0c040;
+  outline-offset: 4px;
+}
+
+/* ══════════ 表格 ══════════ */
+table.note-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 10px 0;
+}
+table.note-table th {
+  background: var(--accent-pale);
+  border: 1px solid var(--border);
+  padding: 7px 12px;
+  text-align: left;
+  font-weight: 700;
+}
+table.note-table td {
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  vertical-align: top;
+}
+table.note-table tr:nth-child(even) td { background: #fafafa; }
+
+mjx-container, .MathJax { text-transform: none !important; }
+</style>
+</head>
+<body>
+<button class="sidebar-toggle" type="button" aria-label="切换目录">×</button>
+<aside class="sidebar">
+  <div class="sb-title">水箱 GPC 实验笔记</div>
+  <a class="sb-home" href="index.html">▣ 返回总目录</a>
+  <div class="sb-group">§2 CARIMA 与丢番图（当前）</div>
+  <ul>
+    <li><a href="#s1">1. CARIMA 模型</a></li>
+    <li><a href="#s2">2. 丢番图恒等式</a></li>
+    <li><a href="#s3">3. 递推公式</a></li>
+    <li><a href="#s4">4. na=1 时的具体形式</a></li>
+    <li><a href="#s5">5. 自由响应 Y1</a></li>
+    <li><a href="#s6">6. 踩坑：F_j 维度错误</a></li>
+    <li><a href="#s7">7. 踩坑：G_mat 索引偏移</a></li>
+  </ul>
+  <div class="sb-group">其他章节</div>
+  <ul>
+    <li><a href="s1_系统辨识.html">§1 系统辨识</a></li>
+    <li><a href="s3_GPC控制律.html">§3 GPC 控制律</a></li>
+    <li><a href="s4_RLS在线辨识.html">§4 RLS 在线辨识</a></li>
+    <li><a href="s5_调参指南.html">§5 调参指南</a></li>
+    <li><a href="s6_补充.html">§6 补充答疑</a></li>
+    <li><a href="s7_代码对照.html">§7 代码对照</a></li>
+  </ul>
+</aside>
+<main class="with-sidebar">
+<header class="title-slide">
+  <h1>§2 &nbsp;CARIMA 与丢番图递推</h1>
+  <div class="subtitle">CARIMA 模型 · 丢番图恒等式 · F/G 递推公式 · na=1 具体形式 · 自由响应</div>
+  <div class="meta">严格对照教材《第五章 单变量广义预测控制》§5.2~§5.3 · 代码 gpc_na1.py</div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s1">
+  <div class="slide-header"><span>1. CARIMA 模型（教材式5.1~5.2）</span></div>
+  <div class="slide-body">
+    <span class="tag-core">★ 核心</span>
+    <p>GPC 基于 CARIMA（Controlled AutoRegressive Integrated Moving Average）模型（教材式5.1）：</p>
+    $$ A(q^{-1})\, y(t) = B(q^{-1})\, u(t-k) + \frac{C(q^{-1})}{\Delta}\, \xi(t) \tag{5.1}$$
+    <p>其中 $\Delta = 1 - q^{-1}$ 是差分算子，$C(q^{-1})=1$（简化）。两边乘 $\Delta$，得等价形式（教材式5.2）：</p>
+    $$ A(q^{-1})\,\Delta y(t) = B(q^{-1})\,\Delta u(t-k) + \xi(t) \tag{5.2}$$
+    <ul class="tri">
+      <li>$A(q^{-1}) = 1 + a_1 q^{-1} + \cdots + a_{n_a} q^{-n_a}$，阶次 $n_a$</li>
+      <li>$B(q^{-1}) = b_0 + b_1 q^{-1} + \cdots + b_{n_b} q^{-n_b}$，阶次 $n_b$</li>
+      <li>$k$：纯时延步数</li>
+    </ul>
+    <div class="note-box">
+      <div class="box-label">为什么引入 CARIMA</div>
+      分母含 $1/\Delta$，即 $z=1$ 处有极点（积分器）。这使得 GPC 对阶跃扰动有<b>零稳态误差</b>，不需要额外加积分项。
+    </div>
+    <p><b>水箱参数</b>：$n_a=1,\ n_b=0,\ k=24$，$A=[1,\ a_1]$，$B=[b_0]$。</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="slide-header"><span>2. 丢番图恒等式（教材式5.3~5.4）</span></div>
+  <div class="slide-body">
+    <span class="tag-core">★ 核心</span>
+    <p>对每个预测步 $j = 1, 2, \ldots, p$，求多项式对 $(E_j,\, F_j)$ 满足（教材式5.3）：</p>
+    $$ 1 = E_j(q^{-1})\, A(q^{-1})\,\Delta + q^{-j}\, F_j(q^{-1}) \tag{5.3}$$
+    <p>各多项式的阶次（教材式5.4）：</p>
+    <table class="note-table">
+      <tr><th>多项式</th><th>阶次</th><th>项数</th></tr>
+      <tr><td>$E_j(q^{-1})$</td><td>$j-1$</td><td>$j$ 项</td></tr>
+      <tr><td>$F_j(q^{-1})$</td><td>$n_a$</td><td>$n_a+1$ 项</td></tr>
+    </table>
+    <p>由此定义（教材式5.5）：</p>
+    $$ G_j(q^{-1}) = E_j(q^{-1})\, B(q^{-1}) \tag{5.5}$$
+    <p>$G_j$ 的阶次 $= (j-1) + n_b = n_b + j - 1$，长度 $= n_b + j$（$n_b=0$ 时长度 $= j$）。</p>
+    <div class="def-box">
+      <div class="box-label">关键性质（教材式5.16）</div>
+      $G_j(q^{-1}) = g_0 + g_1 q^{-1} + \cdots + g_{j-1} q^{-(j-1)} + \cdots$，其中 $g_0, g_1, \ldots, g_{j-1}$ 是系统(5.1)的阶跃响应系数，与 DMC 的脉冲响应系数一致。
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="slide-header"><span>3. 递推公式（教材§5.3，式5.9~5.19）</span></div>
+  <div class="slide-body">
+    <span class="tag-core">★ 核心</span>
+    <p><b>起点 $j=1$</b>（教材式5.9~5.11）：</p>
+    $$ E_1 = 1, \quad G_1 = B(q^{-1}) \tag{5.11}$$
+    $$ F_1(q^{-1}) = (1-a_1) + (a_1-a_2)q^{-1} + \cdots + (a_{n_a-1}-a_{n_a})q^{-(n_a-1)} + a_{n_a} q^{-n_a} \tag{5.10}$$
+    <p>即 $f_1^i = a_i - a_{i+1}$（$i=0,\ldots,n_a-1$，$a_0=1$），$f_1^{n_a} = a_{n_a}$。</p>
+
+    <p><b>递推 $j-1 \to j$</b>（令 $e_{j-1} = f_{j-1}^0$，教材式5.17~5.19）：</p>
+    $$ e_{j-1} = f_{j-1}^0 \tag{5.17}$$
+    $$ f_j^i = f_{j-1}^{i+1} - e_{j-1}(a_{i+1} - a_i), \quad i = 0, 1, \ldots, n_a-1 \quad (a_0 = 1) \tag{5.18a}$$
+    $$ f_j^{n_a} = e_{j-1} \cdot a_{n_a} \tag{5.18b}$$
+    $$ g_j^i = g_{j-1}^i, \quad 0 \leq i \leq j-2 \quad \text{（低段不变）} \tag{5.19a}$$
+    $$ g_j^{n_b+j-1} = e_{j-1} \cdot b_{n_b} \quad \text{（最高项，}n_b=0\text{ 时即 }e_{j-1} \cdot b_0\text{）} \tag{5.19c}$$
+
+    <div class="note-box">
+      <div class="box-label">代码对应（gpc_na1.py）</div>
+      <pre style="font-size:0.85em; margin:0">
+def diophantine(A, b0, p):
+    a = A   # a[0]=1, a[1]=a_1
+    # j=1 初值（式5.10）
+    F[i] = a[i] - a[i+1]   # i=0..na-1
+    F[na] = a[na]
+    # 递推（式5.18a, 5.18b）
+    F_new[i] = F_prev[i+1] - e*(a[i+1]-a[i])
+    F_new[na] = e * a[na]
+    # G_j（式5.19，nb=0）
+    G_new[:j-1] = G_prev   # 低段继承
+    G_new[j-1]  = e * b0   # 最高项
+      </pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s4">
+  <div class="slide-header"><span>4. na=1 时的具体数值</span></div>
+  <div class="slide-body">
+    <span class="tag-bg">○ 数值示例</span>
+    <p>$A = [1,\ a_1] = [1,\ -0.9846]$，$b_0 = 0.024361$，$n_a=1,\ n_b=0$：</p>
+
+    <p><b>$j=1$ 初值</b>（教材式5.10，$n_a=1$）：</p>
+    $$ F_1 = [(1-a_1),\ a_1] = [1.9846,\ -0.9846] \tag{2.1}$$
+    $$ G_1 = [b_0] = [0.024361] \tag{2.2}$$
+
+    <p><b>$j=2$</b>（$e_1 = f_1^0 = 1.9846$）：</p>
+    $$ f_2^0 = f_1^1 - e_1(a_1 - a_0) = -0.9846 - 1.9846 \times (-0.9846 - 1) = 2.9540 \tag{2.3}$$
+    $$ f_2^1 = e_1 \cdot a_1 = 1.9846 \times (-0.9846) = -1.9540 \tag{2.4}$$
+    $$ G_2 = [0.024361,\ e_1 \cdot b_0] = [0.024361,\ 0.048347] \tag{2.5}$$
+
+    <div class="note-box">
+      <div class="box-label">代码验证</div>
+      Python 中 <code>F_list[0] = [1.9846, -0.9846]</code>，<code>G_list[1] = [0.024361, 0.048347]</code>，与手算一致。<br>
+      $G_j$ 的前 $j$ 项 = 系统(5.1)的阶跃响应系数（教材式5.16 的关键性质）。
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s5">
+  <div class="slide-header"><span>5. 自由响应 Y1（教材式5.21~5.22）</span></div>
+  <div class="slide-body">
+    <span class="tag-core">★ 核心</span>
+    <p>$j$ 步最优预测（教材式5.8）：</p>
+    $$ \hat y_{t+j|t} = F_j(q^{-1})\, y(t) + G_j(q^{-1})\, \Delta u(t+j-k) \tag{5.8}$$
+    <p>将 $G_j \Delta u$ 分为已知（历史）和未知（未来）两部分，得预测分解（教材式5.21）：</p>
+    $$ \hat{\mathbf{Y}} = \mathbf{Y}^1 + \mathbf{G}\,\Delta\mathbf{U} \tag{5.21}$$
+    <p>自由响应 $\mathbf{Y}^1$（已知部分）：</p>
+    $$ Y^1_j = F_j(q^{-1})\, y(t) + \sum_{m: j-k-m<0} G_j[m]\, \Delta u(t+j-k-m) \tag{2.6}$$
+    <p>即 $Y^1_j = F_j \cdot y_t$（$F_j$ 项）加上 $G_j$ 中对应历史 $\Delta u$ 的贡献。</p>
+    <p>$n_a=1$ 时 $F_j$ 有 2 项：$Y^1_j \supseteq f_j^0 y(t) + f_j^1 y(t-1)$。</p>
+
+    <p>$\mathbf{G}$ 矩阵（教材式5.22）：$p \times p$ 下三角，$G[i,j] = g_{i-j}$（$i \geq j$，否则0），$g_i = G_{i+1}[i]$。</p>
+
+    <div class="def-box">
+      <div class="box-label">代码对应（gpc_na1.py）</div>
+      <pre style="font-size:0.85em; margin:0">
+def free_response(F_list, G_list, y_buf, du_buf, p, k):
+    for j in range(p):
+        # F_j * y_t（式5.18，F_j有2项）
+        fy = f_j^0*y(t) + f_j^1*y(t-1)
+        # G_j 中历史 Delta*u 的贡献
+        # lag = k + m - j，lag>0 时是历史值
+        gu = sum(G_j[m]*du_buf[-lag] for m if lag>0)
+        Y1[j] = fy + gu
+      </pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s6">
+  <div class="slide-header"><span>6. 踩坑：F_j 维度错误（已修复）</span></div>
+  <div class="slide-body">
+    <span class="tag-bg">⚠ 实际 bug</span>
+    <p><b>错误现象</b>：仿真中 $y$ 完全不跟踪 SP，控制量几乎不动。</p>
+    <p><b>根本原因</b>：第一版代码把 $\tilde A = A\Delta$ 当成新的 $A$ 来递推，$F_j$ 有3项（$n_a+2$），而教材式(5.4b) 明确 $F_j$ 阶次 $= n_a$，有 $n_a+1$ 项。</p>
+    <table class="note-table">
+      <tr><th></th><th>错误版本</th><th>正确版本（教材）</th></tr>
+      <tr><td>递推对象</td><td>$\tilde A = A\Delta$（2阶）</td><td>原始 $A$（1阶）</td></tr>
+      <tr><td>$F_j$ 项数</td><td>$n_a + 2 = 3$</td><td>$n_a + 1 = 2$（式5.4b）</td></tr>
+      <tr><td>$F_1$ 初值</td><td>$[\tilde A_0-\tilde A_1,\ \tilde A_1-\tilde A_2,\ \tilde A_2]$</td><td>$[(1-a_1),\ a_1]$（式5.10）</td></tr>
+    </table>
+    <div class="def-box">
+      <div class="box-label">修复方法（gpc_na1.py）</div>
+      <pre style="font-size:0.85em; margin:0">
+# 正确：用原始 A 的系数递推，F_j 有 na+1=2 项
+F[i] = a[i] - a[i+1]   # i=0..na-1，a_0=1
+F[na] = a[na]           # 式5.10
+      </pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s7">
+  <div class="slide-header"><span>7. 踩坑：G_mat 索引偏移（C++ 版，已修复）</span></div>
+  <div class="slide-body">
+    <span class="tag-bg">⚠ 实际 bug</span>
+    <p><b>错误现象</b>：C++ 版 G2 从第 3 项开始与 Python 不一致，denom 差约 4 倍。</p>
+    <p><b>根本原因</b>：Python 中 $G_j$ 长度为 $j$，最高项在索引 $j-1$；C++ 递推时多分配了一位，最高项写到了索引 $j$ 而不是 $j-1$，导致 $G\_\text{mat}[j][i]$ 的索引偏移了 1。</p>
+    <table class="note-table">
+      <tr><th>$j=2$ 时</th><th>Python $G_\text{list}[1]$</th><th>C++ 错误版</th></tr>
+      <tr><td>最高项位置</td><td>索引 1（$G[1]=0.04835$）</td><td>索引 2（错位）</td></tr>
+    </table>
+    <div class="def-box">
+      <div class="box-label">修复方法（gpc_na1.cpp）</div>
+      <pre style="font-size:0.85em; margin:0">
+// 正确：G_new 长度 j+1，最高项在索引 j（对应 Python G_j[j-1]）
+double G_new[P] = {0};
+for (int kk = 0; kk &lt; jj; kk++) G_new[kk] = G_cur[kk];
+G_new[jj] = e * b0;   // 最高项在 jj
+
+// G_mat[j][i] = G_new[j-i]
+G_mat[jj][ii] = (idx &gt;= 0) ? G_new[idx] : 0.0;
+      </pre>
+    </div>
+  </div>
+</div>
+
+</main>
+<script>
+// sidebar.js — 侧边栏折叠 + 当前页高亮 + 状态持久化
+
+(function () {
+  const KEY = 'note-sidebar-hidden';
+
+  // 1. 折叠按钮行为
+  function wireToggle() {
+    const btn = document.querySelector('button.sidebar-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const hidden = document.body.classList.toggle('sidebar-hidden');
+      document.querySelector('aside.sidebar')?.classList.toggle('collapsed', hidden);
+      try { localStorage.setItem(KEY, hidden ? '1' : '0'); } catch (e) {}
+      btn.textContent = hidden ? '☰' : '×';
+      btn.title = hidden ? '展开目录' : '收起目录';
+    });
+    // 初始状态：从 localStorage 恢复
+    let hidden = false;
+    try { hidden = localStorage.getItem(KEY) === '1'; } catch (e) {}
+    if (hidden) {
+      document.body.classList.add('sidebar-hidden');
+      document.querySelector('aside.sidebar')?.classList.add('collapsed');
+      btn.textContent = '☰';
+      btn.title = '展开目录';
+    } else {
+      btn.textContent = '×';
+      btn.title = '收起目录';
+    }
+  }
+
+  // 2. 按当前 URL 高亮菜单项
+  function highlightCurrent() {
+    const path = location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('aside.sidebar a').forEach(a => {
+      const href = a.getAttribute('href');
+      if (href && href.split('#')[0] === path) a.classList.add('active');
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    wireToggle();
+    highlightCurrent();
+  });
+})();
+
+</script>
+</body>
+</html>
