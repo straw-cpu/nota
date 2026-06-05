@@ -1,0 +1,811 @@
+<!-- mynotes template: academic_lecture | source: AI-Offer/academic.html | 适用: 讲义、速查手册、多章节笔记 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>代数基础 Lecture 10</title>
+
+<meta name="generator" content="mynotes (academic_lecture, v1)">
+<meta name="mynotes:created-at" content="2026-06-04">
+<meta name="mynotes:template" content="academic_lecture">
+<meta name="mynotes:theme" content="dark">
+
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    tags: 'ams'
+  },
+  options: { skipHtmlTags: ['script','noscript','style','textarea'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded', () => hljs.highlightAll());</script>
+
+<style>
+:root {
+  /* ── 主色（标题、边框、active） ── */
+  --accent-dark:  #ff6b6b;
+  --accent-mid:   #ff8a80;
+  --accent-pale:  #3a1a1a;
+
+  /* ── academic_lecture 兼容变量（来自 ARIS academic.html） ── */
+  --bg:           #1e1e1e;
+  --bg-soft:      #252525;
+  --bg-code:      #2a2a2a;
+  --ink:          #e8e8e8;
+  --ink-soft:     #c0c0c0;
+  --ink-muted:    #888888;
+  --primary:      #4a90d9;
+  --primary-soft: #6aaae8;
+  --accent:       #ff8a80;
+  --warn:         #f0c040;
+  --warn-bg:      #2e2600;
+  --info-bg:      #0e2040;
+  --good-bg:      #0a2a1a;
+  --good:         #4caf80;
+  --bad-bg:       #2a0a0a;
+  --bad:          #ff6b6b;
+  --border:       #3a3a3a;
+  --border-soft:  #2e2e2e;
+
+  /* ── minimal_slide 变量 ── */
+  --gray-bar:     #2e2e2e;
+  --blue-pale:    #0e1e30;
+  --green-pale:   #0a1e12;
+  --yellow-pale:  #1e1800;
+  --text:         #e8e8e8;
+  --muted:        #888888;
+  --bg-page:      #181818;
+  --bg-card:      #242424;
+  --bg-sidebar:   #1e1e1e;
+
+  /* ── 字体 ── */
+  --font-main:    "PingFang SC", "Microsoft YaHei", "Liberation Serif", serif;
+  --font-serif:   "Source Serif Pro", "Georgia", "Songti SC", serif;
+  --font-mono:    "SFMono-Regular", "JetBrains Mono", Consolas, monospace;
+
+  /* ── 尺寸 ── */
+  --radius:       4px;
+  --radius-lg:    6px;
+  --shadow-card:  0 1px 3px rgba(0,0,0,.4);
+  --sidebar-w:    260px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: "Source Serif Pro", "Source Serif 4", "Crimson Pro", "Georgia", "Songti SC", "STSong", serif;
+  line-height: 1.65;
+  color: var(--ink);
+  background: var(--bg);
+  margin: 0;
+  padding: 0;
+  font-size: 16px;
+}
+
+.layout {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 48px;
+  padding: 40px 32px;
+}
+
+nav.toc {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  font-size: 13px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  border-right: 1px solid var(--border-soft);
+  padding-right: 16px;
+}
+nav.toc h3 {
+  margin: 0 0 12px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+nav.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
+nav.toc ol li { margin: 5px 0; counter-increment: toc; }
+nav.toc ol li::before { content: counter(toc) ". "; color: var(--ink-muted); margin-right: 4px; }
+nav.toc a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-bottom: 1px dotted transparent;
+}
+nav.toc a:hover { color: var(--primary); border-bottom-color: var(--primary); }
+nav.toc ul { list-style: none; padding-left: 14px; margin: 3px 0; font-size: 12px; }
+nav.toc ul li::before { content: "→ "; color: var(--border); }
+
+main { min-width: 0; }
+
+header.hero {
+  border-bottom: 3px double var(--primary);
+  padding-bottom: 24px;
+  margin-bottom: 32px;
+}
+header.hero .eyebrow {
+  font-family: inherit;
+  color: var(--ink-muted);
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+header.hero h1 {
+  font-size: 32px;
+  line-height: 1.2;
+  margin: 0 0 12px;
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+header.hero .subtitle {
+  font-size: 16px;
+  color: var(--ink-soft);
+  margin: 0 0 8px;
+  font-style: italic;
+}
+header.hero .byline {
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin: 0 0 20px;
+}
+header.hero .byline strong { color: var(--ink); font-weight: 600; }
+header.hero .meta {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--ink-muted);
+  border-top: 1px solid var(--border-soft);
+  padding-top: 14px;
+}
+header.hero .meta span strong { color: var(--ink-soft); }
+header.hero .meta code {
+  font-family: "JetBrains Mono", "SF Mono", "Menlo", "Consolas", monospace;
+  font-size: 11px;
+  background: var(--bg-soft);
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--border-soft);
+}
+
+h2 {
+  font-size: 24px;
+  margin: 44px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink);
+  font-weight: 700;
+}
+h2 .num { color: var(--primary); font-weight: 600; margin-right: 8px; }
+h3 { font-size: 19px; margin: 28px 0 10px; color: var(--primary); font-weight: 600; }
+h4 { font-size: 16px; margin: 20px 0 8px; color: var(--ink); font-weight: 600; }
+
+p { margin: 10px 0; }
+ul, ol { padding-left: 22px; margin: 10px 0; }
+ul li, ol li { margin: 4px 0; }
+ul li::marker { color: var(--primary); }
+
+strong { color: var(--accent); font-weight: 600; }
+em { color: var(--ink-soft); }
+
+a { color: var(--primary); }
+a:hover { color: var(--accent); }
+
+code:not(.hljs) {
+  font-family: "JetBrains Mono", "SF Mono", "Menlo", "Consolas", monospace;
+  font-size: 0.86em;
+  background: var(--bg-code);
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--border-soft);
+  color: var(--accent);
+}
+
+pre {
+  background: #fafaf6;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  padding: 0;
+  overflow-x: auto;
+  border-radius: 4px;
+  margin: 14px 0;
+}
+pre code, pre code.hljs {
+  background: transparent !important;
+  display: block;
+  padding: 14px 18px !important;
+  font-size: 13px;
+  line-height: 1.55;
+  font-family: "JetBrains Mono", "SF Mono", "Menlo", monospace;
+  color: var(--ink);
+}
+pre.diagram {
+  background: #f9f6ed;
+  border-left: 4px solid var(--accent);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.callout {
+  margin: 16px 0;
+  padding: 12px 16px;
+  border-radius: 4px;
+  border-left: 4px solid;
+  font-size: 15px;
+}
+.callout-title {
+  font-weight: 600;
+  margin-bottom: 6px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.callout-info { background: var(--info-bg); border-left-color: var(--primary); }
+.callout-info .callout-title { color: var(--primary); }
+.callout-warn { background: var(--warn-bg); border-left-color: var(--warn); }
+.callout-warn .callout-title { color: var(--warn); }
+.callout-good { background: var(--good-bg); border-left-color: var(--good); }
+.callout-good .callout-title { color: var(--good); }
+.callout-bad { background: var(--bad-bg); border-left-color: var(--bad); }
+.callout-bad .callout-title { color: var(--bad); }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 14px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+thead { background: var(--primary); color: white; }
+th, td {
+  text-align: left;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: top;
+}
+th { font-weight: 600; font-size: 13px; letter-spacing: 0.02em; }
+tr:last-child td { border-bottom: none; }
+tbody tr:nth-child(even) { background: var(--bg-soft); }
+
+details.qa, details {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  margin: 10px 0;
+  padding: 0;
+}
+details summary {
+  cursor: pointer;
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--primary);
+  list-style: none;
+  user-select: none;
+}
+details summary::-webkit-details-marker { display: none; }
+details summary::before {
+  content: "▸ ";
+  margin-right: 4px;
+  display: inline-block;
+  transition: transform 0.15s;
+}
+details[open] summary::before { transform: rotate(90deg); }
+details[open] summary { border-bottom: 1px solid var(--border-soft); }
+details > :not(summary) { padding: 10px 14px; }
+details p:first-of-type { margin-top: 8px; }
+
+mjx-container[display="true"] { margin: 12px 0 !important; }
+mjx-container, .MathJax { text-transform: none !important; }
+
+footer.note-footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+/* TOC scrollspy active state */
+nav.toc a.active {
+  color: var(--accent);
+  font-weight: 600;
+  border-bottom-color: var(--accent);
+}
+
+/* Long-code auto-collapse */
+details.code-card {
+  margin: 14px 0;
+  background: var(--bg-code);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: 4px;
+}
+details.code-card > summary {
+  cursor: pointer;
+  padding: 8px 14px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-family: "JetBrains Mono", "SF Mono", monospace;
+  list-style: none;
+  user-select: none;
+}
+details.code-card > summary::-webkit-details-marker { display: none; }
+details.code-card > summary::before { content: none; }
+details.code-card > pre { margin: 0; padding: 0; border: none; border-left: none; border-radius: 0; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; gap: 20px; padding: 20px 16px; }
+  nav.toc {
+    position: static;
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid var(--border-soft);
+    padding-right: 0;
+    padding-bottom: 14px;
+  }
+  header.hero h1 { font-size: 24px; }
+  h2 { font-size: 20px; }
+}
+@media print {
+  nav.toc { display: none; }
+  .layout { grid-template-columns: 1fr; padding: 0; }
+  body { background: white; }
+  header.hero { border-bottom-color: var(--ink); }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="toc">
+  <h3>目录</h3>
+  <ol>
+    <li><a href="#s1">§1 埃尔米特矩阵特征值性质</a>
+      <ul>
+        <li><a href="#thm-139">定理 1.3.9 夹逼不等式</a></li>
+        <li><a href="#def-135">定义 1.3.5 瑞利商</a></li>
+        <li><a href="#thm-1310">定理 1.3.10 极值定理</a></li>
+        <li><a href="#thm-1311">定理 1.3.11 子空间刻画</a></li>
+      </ul>
+    </li>
+    <li><a href="#s2">§2 极小极大定理（Courant-Fischer）</a>
+      <ul>
+        <li><a href="#thm-1312">定理 1.3.12 Courant-Fischer</a></li>
+      </ul>
+    </li>
+    <li><a href="#s3">§3 正规矩阵</a>
+      <ul>
+        <li><a href="#thm-schur">Schur 定理（酉三角化）</a></li>
+        <li><a href="#def-351">定义 3.5.1 正规矩阵</a></li>
+        <li><a href="#thm-351">定理 3.5.1 正规⟺酉对角化</a></li>
+        <li><a href="#thm-352">定理 3.5.2 正规⟺n个正交特征向量</a></li>
+        <li><a href="#thm-schur-ineq">Schur 不等式</a></li>
+        <li><a href="#ex-351">例 3.5.1 相似≠酉对角化</a></li>
+      </ul>
+    </li>
+    <li><a href="#s4">§4 正交投影</a>
+      <ul>
+        <li><a href="#def-1214">定义 1.2.14 子空间正交</a></li>
+        <li><a href="#def-1215">定义 1.2.15 正交分解与正交补</a></li>
+        <li><a href="#thm-1213">定理 1.2.13 正交补存在唯一性</a></li>
+        <li><a href="#app-homo">应用：齐次方程组解空间</a></li>
+      </ul>
+    </li>
+    <li><a href="#s5">§5 正交投影变换与矩阵</a>
+      <ul>
+        <li><a href="#def-1216">定义 1.2.16 正交投影变换</a></li>
+        <li><a href="#deriv-proj">投影矩阵推导</a></li>
+        <li><a href="#thm-1215">定理 1.2.15 等价刻画</a></li>
+      </ul>
+    </li>
+  </ol>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">代数基础 · Lecture 10</div>
+  <h1>代数基础 Lecture 10</h1>
+  <div class="subtitle">正交投影与正规矩阵</div>
+  <div class="byline"><strong>主讲：</strong>阚震 · <strong>日期：</strong>2026-06-02</div>
+  <div class="meta">
+    <span><strong>主题：</strong>Hermitian矩阵特征值 · Courant-Fischer定理 · 正规矩阵 · 正交投影</span>
+    <span><strong>页数：</strong>p1–p24</span>
+  </div>
+</header>
+
+<!-- §1 -->
+<section id="s1">
+<h2 id="s1"><span class="num">§1</span>埃尔米特矩阵特征值的性质</h2>
+
+<p>本节内容对应课件 §1.3.3，给出埃尔米特矩阵特征值的界估计与瑞利商刻画。</p>
+
+<h3 id="thm-139">定理 1.3.9：特征值的夹逼不等式</h3>
+<p>设 $A$ 为 $n$ 阶埃尔米特矩阵，则</p>
+$$\lambda_{\min}(A) \cdot I \leq A \leq \lambda_{\max}(A) \cdot I$$
+<p>其中不等式在半正定序意义下成立，即 $A - \lambda_{\min}(A)I \geq 0$，$\lambda_{\max}(A)I - A \geq 0$。</p>
+<details class="qa">
+  <summary>证明</summary>
+  <div class="qa-answer">
+    <p>由于 $A$ 是埃尔米特矩阵，存在酉矩阵 $U$ 使得 $U^H A U = \mathrm{diag}(\lambda_1,\ldots,\lambda_n)$，其中 $\lambda_n = \lambda_{\min} \leq \cdots \leq \lambda_1 = \lambda_{\max}$。</p>
+    <p>对任意 $x \in \mathbb{C}^n$，令 $y = U^H x$，则</p>
+    $$x^H(A - \lambda_{\min}I)x = y^H(\Lambda - \lambda_{\min}I)y = \sum_{i=1}^n (\lambda_i - \lambda_{\min})|y_i|^2 \geq 0$$
+    <p>故 $A - \lambda_{\min}I \geq 0$（半正定）。同理 $\lambda_{\max}I - A \geq 0$。$\blacksquare$</p>
+  </div>
+</details>
+
+<h3 id="def-135">定义 1.3.5：瑞利商（Rayleigh Quotient）</h3>
+<p>设 $A$ 为 $n$ 阶埃尔米特矩阵，对 $\forall x \in \mathbb{C}^n,\ x \neq 0$，定义</p>
+$$\mathcal{R}(x) = \frac{x^H A x}{x^H x}$$
+<div class="callout callout-info">
+  <div class="callout-title">关键性质</div>
+  瑞利商是齐次的：$\mathcal{R}(cx) = \mathcal{R}(x)$，$c \neq 0$。因此只需在单位球面 $\|x\|=1$ 上分析极值。
+</div>
+
+<h3 id="thm-1310">定理 1.3.10：瑞利商的极值定理</h3>
+<p>设 $A$ 的特征值 $\lambda_1 \geq \lambda_2 \geq \cdots \geq \lambda_n$，则：</p>
+<ol>
+  <li>$\mathcal{R}(cx) = \mathcal{R}(x)$，$c \in \mathbb{C},\ c \neq 0$</li>
+  <li>$\lambda_n \leq \mathcal{R}(x) \leq \lambda_1$，$\forall x \neq 0$</li>
+  <li>$\displaystyle\lambda_1 = \max_{x \neq 0} \mathcal{R}(x)$，$\displaystyle\lambda_n = \min_{x \neq 0} \mathcal{R}(x)$</li>
+</ol>
+<details class="qa">
+  <summary>证明</summary>
+  <div class="qa-answer">
+    <p><strong>(1)</strong> 直接代入：$\mathcal{R}(cx) = \frac{(cx)^H A(cx)}{(cx)^H(cx)} = \frac{|c|^2 x^H A x}{|c|^2 x^H x} = \mathcal{R}(x)$。</p>
+    <p><strong>(2)(3)</strong> 设 $A$ 有谱分解 $A = U\Lambda U^H$，令 $y = U^H x$（坐标变换，$\|y\|=\|x\|$），则</p>
+    $$\mathcal{R}(x) = \frac{x^H A x}{x^H x} = \frac{y^H \Lambda y}{y^H y} = \frac{\sum_i \lambda_i |y_i|^2}{\sum_i |y_i|^2}$$
+    <p>这是 $\lambda_i$ 的加权平均（权重 $w_i = |y_i|^2/\|y\|^2 \geq 0$，$\sum w_i = 1$），故</p>
+    $$\lambda_n = \sum_i \lambda_n w_i \leq \mathcal{R}(x) \leq \sum_i \lambda_1 w_i = \lambda_1$$
+    <p>取 $x = u_1$（最大特征向量），则 $y = e_1$，$\mathcal{R} = \lambda_1$；取 $x = u_n$，$\mathcal{R} = \lambda_n$。等号均可达。$\blacksquare$</p>
+  </div>
+</details>
+
+<h3 id="thm-1311">定理 1.3.11：子空间约束下的特征值刻画</h3>
+<p>设 $A$ 的特征值 $\lambda_1 \geq \cdots \geq \lambda_n$，对应标准正交特征向量 $x_1, \ldots, x_n$，记 $S^{(k)} = \mathrm{span}\{x_1, \ldots, x_k\}$，则</p>
+$$\lambda_1 = \max_{\substack{x \neq 0,\, x \in S^{(k)}}} \mathcal{R}(x), \qquad \lambda_k = \min_{\substack{x \neq 0,\, x \in S^{(k)}}} \mathcal{R}(x)$$
+<details class="qa">
+  <summary>证明</summary>
+  <div class="qa-answer">
+    <p>对 $\forall x \in S^{(k)},\ x \neq 0$，写 $x = \sum_{i=1}^k b_i x_i$，则</p>
+    $$\mathcal{R}(x) = \frac{\sum_{i=1}^k |b_i|^2 \lambda_i}{\sum_{i=1}^k |b_i|^2}$$
+    <p>这是 $\lambda_1,\ldots,\lambda_k$ 的加权平均，故 $\lambda_k \leq \mathcal{R}(x) \leq \lambda_1$。</p>
+    <p>取 $x = x_1$ 得 $\mathcal{R} = \lambda_1$；取 $x = x_k$ 得 $\mathcal{R} = \lambda_k$，两个极值均可达。$\blacksquare$</p>
+  </div>
+</details>
+
+<details class="qa">
+  <summary>Q：为什么要引入瑞利商？它与特征值问题有什么联系？</summary>
+  <div class="qa-answer">
+    <p>瑞利商把特征值问题转化为<strong>连续优化问题</strong>。$Ax = \lambda x$ 要求精确解，而 $\mathcal{R}(x)$ 对任意 $x$ 都有定义，且在特征向量处取到特征值。</p>
+    <p>实用价值：幂法（Power Method）迭代求最大特征值，本质上是迭代最大化瑞利商；Lanczos 方法、瑞利-里兹方法都基于此思想。</p>
+  </div>
+</details>
+</section>
+
+<!-- §2 -->
+<section id="s2">
+<h2 id="s2"><span class="num">§2</span>极小极大定理（Courant-Fischer 定理）</h2>
+
+<h3 id="thm-1312">定理 1.3.12（Courant-Fischer 极小极大定理）</h3>
+<p>设 $A$ 为 $n$ 阶埃尔米特矩阵，特征值 $\lambda_1 \geq \cdots \geq \lambda_n$，$V_i$ 为 $\mathbb{C}^n$ 中任意 $i$ 维子空间，则</p>
+$$\lambda_i = \max_{V_i} \min_{\substack{x \in V_i \\ x \neq 0}} \mathcal{R}(x), \qquad \lambda_j = \min_{V_{n-j+1}} \max_{\substack{x \in V_{n-j+1} \\ x \neq 0}} \mathcal{R}(x)$$
+
+<details class="qa">
+  <summary>证明（$\lambda_i$ 的极大极小表示）</summary>
+  <div class="qa-answer">
+    <p>设 $A$ 的标准正交特征向量为 $x_1,\ldots,x_n$（对应 $\lambda_1 \geq \cdots \geq \lambda_n$），令 $U_i = \mathrm{span}\{x_i, x_{i+1}, \ldots, x_n\}$（维数 $n-i+1$）。</p>
+    <p><strong>第一步：证明 $\leq \lambda_i$（上界）。</strong></p>
+    <p>对任意 $i$ 维子空间 $V_i$，由维数公式</p>
+    $$\dim(V_i \cap U_i) = \dim V_i + \dim U_i - \dim(V_i + U_i) \geq i + (n-i+1) - n = 1$$
+    <p>故 $V_i \cap U_i$ 中存在非零向量 $\bar{x}$，写 $\bar{x} = \sum_{k=i}^n a_k x_k$，则</p>
+    $$\mathcal{R}(\bar{x}) = \frac{\sum_{k=i}^n |a_k|^2 \lambda_k}{\sum_{k=i}^n |a_k|^2} \leq \lambda_i$$
+    <p>因此 $\min_{x \in V_i} \mathcal{R}(x) \leq \mathcal{R}(\bar{x}) \leq \lambda_i$，取 max 后仍有 $\max_{V_i} \min_{x \in V_i} \mathcal{R}(x) \leq \lambda_i$。</p>
+    <p><strong>第二步：证明 $\geq \lambda_i$（下界可达）。</strong></p>
+    <p>取 $V^* = \mathrm{span}\{x_1, \ldots, x_i\}$，对任意 $x = \sum_{k=1}^i b_k x_k \in V^*$，</p>
+    $$\mathcal{R}(x) = \frac{\sum_{k=1}^i |b_k|^2 \lambda_k}{\sum_{k=1}^i |b_k|^2} \geq \lambda_i$$
+    <p>故 $\min_{x \in V^*} \mathcal{R}(x) = \lambda_i$（取 $x = x_i$ 时达到），从而</p>
+    $$\max_{V_i} \min_{x \in V_i} \mathcal{R}(x) \geq \lambda_i$$
+    <p>综合两步得等号。$\blacksquare$</p>
+  </div>
+</details>
+
+<div class="callout callout-info">
+  <div class="callout-title">直觉</div>
+  $\lambda_i$ 是"对所有 $i$ 维子空间，在其上最小化瑞利商"这件事的最大值。"最优"子空间就是前 $i$ 个特征向量张成的空间。
+</div>
+
+<details class="qa">
+  <summary>Q：Courant-Fischer 定理有什么应用？</summary>
+  <div class="qa-answer">
+    <p><strong>1. 特征值交错定理（Interlacing）：</strong>若 $B$ 是 $A$ 的 $(n-1)$ 阶主子阵，则 $\lambda_{i+1}(A) \leq \lambda_i(B) \leq \lambda_i(A)$，由 C-F 定理直接推导。</p>
+    <p><strong>2. Weyl 不等式：</strong>若 $C = A + E$（$E$ 为埃尔米特扰动），则 $|\lambda_i(C) - \lambda_i(A)| \leq \|E\|_2$。</p>
+    <p><strong>3. PCA 最优子空间：</strong>前 $k$ 个特征向量张成的子空间是保留方差最大的 $k$ 维子空间，正是 C-F 最大化问题的解。</p>
+  </div>
+</details>
+</section>
+
+<!-- §3 -->
+<section id="s3">
+<h2 id="s3"><span class="num">§3</span>正规矩阵</h2>
+
+<h3 id="thm-schur">Schur 定理（酉三角化）</h3>
+<p>任意 $n$ 阶复方阵 $A$ 都酉相似于上三角阵，即存在酉矩阵 $U$ 和上三角阵 $T$ 使得</p>
+$$U^H A U = T = \begin{bmatrix} \lambda_1 & * & \cdots & * \\ & \lambda_2 & \cdots & * \\ & & \ddots & \vdots \\ 0 & & & \lambda_n \end{bmatrix}$$
+<p>其中 $\lambda_1, \ldots, \lambda_n$ 是 $A$ 的特征值（按重数计）。</p>
+<details class="qa">
+  <summary>证明（数学归纳法）</summary>
+  <div class="qa-answer">
+    <p><strong>$n=1$ 时</strong>平凡成立。</p>
+    <p><strong>假设对 $n-1$ 阶矩阵成立，证 $n$ 阶情形。</strong></p>
+    <p>设 $\lambda_1$ 是 $A$ 的任一特征值，$v_1$ 为对应单位特征向量。将 $v_1$ 扩充为 $\mathbb{C}^n$ 的标准正交基 $\{v_1, v_2, \ldots, v_n\}$，令 $U_1 = [v_1\ v_2\ \cdots\ v_n]$（酉矩阵），则</p>
+    $$U_1^H A U_1 = \begin{bmatrix} \lambda_1 & b^H \\ 0 & A_1 \end{bmatrix}$$
+    <p>其中 $A_1$ 是 $(n-1)$ 阶矩阵。由归纳假设，$\exists$ 酉矩阵 $\hat{U}$ 使 $\hat{U}^H A_1 \hat{U} = T_1$（上三角）。令</p>
+    $$U_2 = \begin{bmatrix} 1 & 0 \\ 0 & \hat{U} \end{bmatrix}, \quad U = U_1 U_2$$
+    <p>则 $U$ 为酉矩阵，且</p>
+    $$U^H A U = U_2^H (U_1^H A U_1) U_2 = \begin{bmatrix} \lambda_1 & b^H \hat{U} \\ 0 & T_1 \end{bmatrix}$$
+    <p>这是上三角阵。$\blacksquare$</p>
+  </div>
+</details>
+
+<h3 id="def-351">定义 3.5.1：正规矩阵</h3>
+<p>设 $A \in \mathbb{C}^{n \times n}$，若</p>
+$$AA^H = A^H A$$
+<p>则称 $A$ 为<strong>正规矩阵</strong>。实数域上则要求 $AA^T = A^T A$。</p>
+<p>常见正规矩阵（均可验证满足定义）：</p>
+<ul>
+  <li>对称阵 $A = A^T$、反对称阵 $A = -A^T$</li>
+  <li>正交阵 $AA^T = I$、酉矩阵 $UU^H = I$</li>
+  <li>埃尔米特矩阵 $A = A^H$、反埃尔米特矩阵 $A = -A^H$</li>
+  <li>对角阵</li>
+</ul>
+
+<h3 id="thm-351">定理 3.5.1：正规矩阵的酉对角化充要条件</h3>
+<p>$A \in \mathbb{C}^{n \times n}$ 酉相似于对角阵 $\Longleftrightarrow$ $A$ 为正规矩阵。</p>
+<details class="qa">
+  <summary>证明（充分性：正规 $\Rightarrow$ 酉对角化）</summary>
+  <div class="qa-answer">
+    <p>设 $AA^H = A^H A$。由 Schur 定理，$\exists$ 酉矩阵 $U$ 使 $U^H A U = T$（上三角）。</p>
+    <p>计算 $TT^H$ 与 $T^H T$：</p>
+    $$TT^H = U^H A U(U^H A U)^H = U^H A(UU^H)A^H U = U^H AA^H U$$
+    $$T^H T = (U^H A U)^H(U^H A U) = U^H A^H(UU^H)A U = U^H A^H A U$$
+    <p>由 $AA^H = A^H A$ 得 $TT^H = T^H T$。</p>
+    <p>现在逐行证 $T$ 的非对角元为零。比较 $(1,1)$ 元：</p>
+    $$(TT^H)_{11} = |t_{11}|^2 + |t_{12}|^2 + \cdots + |t_{1n}|^2$$
+    $$(T^H T)_{11} = |t_{11}|^2$$
+    <p>（$T$ 是上三角，$T^H$ 是下三角，$(T^H T)_{11}$ 只有 $|t_{11}|^2$ 一项）</p>
+    <p>由 $(TT^H)_{11} = (T^H T)_{11}$ 得 $t_{12} = \cdots = t_{1n} = 0$。</p>
+    <p>对第 $k$ 行类推（归纳），可得所有非对角元 $t_{ij} = 0\ (i \neq j)$，即 $T$ 是对角阵。$\blacksquare$</p>
+  </div>
+</details>
+<details class="qa">
+  <summary>证明（必要性：酉对角化 $\Rightarrow$ 正规）</summary>
+  <div class="qa-answer">
+    <p>设 $U^H A U = \Lambda = \mathrm{diag}(\lambda_1,\ldots,\lambda_n)$，则 $A = U\Lambda U^H$。</p>
+    $$AA^H = U\Lambda U^H (U\Lambda U^H)^H = U\Lambda(U^H U)\bar{\Lambda} U^H = U\Lambda\bar{\Lambda} U^H$$
+    $$A^H A = (U\Lambda U^H)^H U\Lambda U^H = U\bar{\Lambda}(U^H U)\Lambda U^H = U\bar{\Lambda}\Lambda U^H$$
+    <p>因为 $\Lambda\bar{\Lambda} = \bar{\Lambda}\Lambda$（对角矩阵乘法交换），故 $AA^H = A^H A$。$\blacksquare$</p>
+  </div>
+</details>
+
+<p><strong>推论：</strong>正规矩阵若同时为三角矩阵，则必为对角矩阵。</p>
+
+<h3 id="thm-352">定理 3.5.2：正规矩阵的等价刻画</h3>
+<p>$A$ 为正规矩阵 $\Longleftrightarrow$ $A$ 有 $n$ 个两两正交的单位特征向量。</p>
+<details class="qa">
+  <summary>证明</summary>
+  <div class="qa-answer">
+    <p><strong>$(\Rightarrow)$</strong> 由定理 3.5.1，正规矩阵酉相似于对角阵：$U^H A U = \Lambda$，$U = [u_1\ \cdots\ u_n]$ 为酉矩阵。则 $Au_i = \lambda_i u_i$，且 $\{u_i\}$ 是标准正交基，即 $n$ 个两两正交的单位特征向量。</p>
+    <p><strong>$(\Leftarrow)$</strong> 设 $Au_i = \lambda_i u_i$，$u_i^H u_j = \delta_{ij}$，令 $U = [u_1\ \cdots\ u_n]$（酉矩阵），则 $U^H A U = \Lambda$（对角），故 $A = U\Lambda U^H$ 为正规矩阵（必要性已证）。$\blacksquare$</p>
+  </div>
+</details>
+<p><strong>推论 3：</strong>正规矩阵属于不同特征值的特征向量相互正交。</p>
+
+<h3 id="thm-schur-ineq">Schur 不等式</h3>
+<p>设 $A = [a_{ij}] \in \mathbb{C}^{n \times n}$，特征值为 $\lambda_1, \ldots, \lambda_n$，则</p>
+$$\sum_{i=1}^{n} |\lambda_i|^2 \leq \sum_{i,j=1}^{n} |a_{ij}|^2 = \|A\|_F^2$$
+<p>等号成立当且仅当 $A$ 为正规矩阵。</p>
+<details class="qa">
+  <summary>证明</summary>
+  <div class="qa-answer">
+    <p>由 Schur 定理，$U^H A U = T$（上三角），$T$ 的对角元为特征值 $\lambda_i$。</p>
+    <p>酉变换保 Frobenius 范数：$\|A\|_F^2 = \|T\|_F^2 = \sum_{i=1}^n |\lambda_i|^2 + \sum_{i < j} |t_{ij}|^2$。</p>
+    <p>因 $\sum_{i<j}|t_{ij}|^2 \geq 0$，得 $\|A\|_F^2 \geq \sum |\lambda_i|^2$。</p>
+    <p>等号成立 $\Leftrightarrow$ $t_{ij} = 0\ (i \neq j)$ $\Leftrightarrow$ $T$ 为对角阵 $\Leftrightarrow$ $A$ 为正规矩阵。$\blacksquare$</p>
+  </div>
+</details>
+
+<h3 id="ex-351">例 3.5.1：相似对角化 ≠ 酉对角化</h3>
+<p>$A = \begin{bmatrix} 1 & 1 \\ 0 & 0 \end{bmatrix}$，判断是否为正规矩阵，是否可酉对角化。</p>
+<details class="qa">
+  <summary>解</summary>
+  <div class="qa-answer">
+    <p><strong>验证正规性：</strong></p>
+    $$AA^T = \begin{bmatrix}1&1\\0&0\end{bmatrix}\begin{bmatrix}1&0\\1&0\end{bmatrix} = \begin{bmatrix}2&0\\0&0\end{bmatrix}$$
+    $$A^T A = \begin{bmatrix}1&0\\1&0\end{bmatrix}\begin{bmatrix}1&1\\0&0\end{bmatrix} = \begin{bmatrix}1&1\\1&1\end{bmatrix}$$
+    <p>$AA^T \neq A^T A$，故 $A$ <strong>不是正规矩阵</strong>，不能酉对角化。</p>
+    <p><strong>相似对角化：</strong>特征多项式 $\det(\lambda I - A) = \lambda(\lambda-1) = 0$，特征值 $\lambda_1 = 0,\ \lambda_2 = 1$。</p>
+    <p>$\lambda_1 = 0$：$(A - 0)x = 0 \Rightarrow x_1 = (-1, 1)^T$；$\lambda_2 = 1$：$(A-I)x = 0 \Rightarrow x_2 = (1, 0)^T$。</p>
+    <p>两特征向量线性无关（但<strong>不正交</strong>），令 $C = \begin{bmatrix}-1&1\\1&0\end{bmatrix}$，则</p>
+    $$C^{-1}AC = \begin{bmatrix}0&0\\0&1\end{bmatrix}$$
+    <p>可相似对角化，但 $C$ 不是酉矩阵。$\blacksquare$</p>
+  </div>
+</details>
+
+<details class="qa">
+  <summary>Q：正规矩阵和埃尔米特矩阵的关系？</summary>
+  <div class="qa-answer">
+    <p>埃尔米特矩阵 $\subset$ 正规矩阵。埃尔米特矩阵满足 $A = A^H$，可直接验证 $AA^H = A^2 = A^H A$。</p>
+    <p>正规矩阵更广泛：酉矩阵、反埃尔米特矩阵也是正规矩阵，但特征值可以是复数。埃尔米特矩阵特征值必为实数，这是关键区别。</p>
+  </div>
+</details>
+</section>
+
+<!-- §4 -->
+<section id="s4">
+<h2 id="s4"><span class="num">§4</span>正交投影</h2>
+
+<h3 id="intuition-proj">正交投影的直觉</h3>
+<p>三维空间中向量 $\vec{OP} = (x, y, z)^T$ 投影到 $xOy$ 平面：$(x, y, z) \mapsto (x, y, 0)$。对应线性变换矩阵</p>
+$$A = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 0 \end{bmatrix}$$
+
+<h3 id="def-1214">定义 1.2.14：子空间正交</h3>
+<p>设 $V_1, V_2$ 是内积空间 $V^n$ 的子空间，若 $\forall x_1 \in V_1,\ x_2 \in V_2$ 均有 $(x_1, x_2) = 0$，则称 $V_1 \perp V_2$。</p>
+
+<h3 id="def-1215">定义 1.2.15：正交分解与正交补</h3>
+<p>若 $V_1 \perp V_2$ 且 $V^n = V_1 + V_2$，则称 $V_1 + V_2$ 为 $V^n$ 的<strong>正交分解</strong>，$V_1, V_2$ 互为<strong>正交补空间</strong>，记 $V_2 = V_1^\perp$。</p>
+
+<div class="callout callout-info">
+  <div class="callout-title">与一般直和分解的区别</div>
+  $V^n = V_1 \oplus V_2$（直和）不唯一；正交分解 $V^n = V_1 \oplus V_1^\perp$ 在给定 $V_1$ 下是唯一的。
+</div>
+
+<h3 id="thm-1213">定理 1.2.13：正交补的存在唯一性</h3>
+<p>设 $V_1$ 是内积空间 $V^n$ 的任一子空间，则存在<strong>唯一</strong>子空间 $V_2 \subset V^n$ 使得 $V_1 + V_2$ 是正交分解。</p>
+<details class="qa">
+  <summary>证明</summary>
+  <div class="qa-answer">
+    <p><strong>存在性：</strong>设 $e_1, \ldots, e_m$ 是 $V_1$ 的标准正交基（Gram-Schmidt 得到），将其扩充为 $V^n$ 的标准正交基 $\{e_1, \ldots, e_m, e_{m+1}, \ldots, e_n\}$。令 $V_2 = \mathrm{span}(e_{m+1}, \ldots, e_n)$。</p>
+    <p>则 $\forall x_1 \in V_1,\ x_2 \in V_2$：$(x_1, x_2) = 0$（标准正交基的正交性），故 $V_1 \perp V_2$。且 $V_1 + V_2 = V^n$（基向量合并覆盖全空间）。</p>
+    <p><strong>唯一性：</strong>设另有 $V_3$ 也满足 $V_1 + V_3 = V^n$，$V_1 \perp V_3$。对任意 $\beta \in V_3,\ \beta \neq 0$：由 $\beta \perp V_1$ 及 $\beta \in V^n = V_1 + V_2$ 知 $\beta \in V_2$，故 $V_3 \subset V_2$。对称地 $V_2 \subset V_3$，故 $V_2 = V_3$。$\blacksquare$</p>
+  </div>
+</details>
+
+<h3 id="app-homo">应用：齐次方程组的解空间</h3>
+<p>对于系数矩阵秩为 $r$ 的齐次方程组 $Ax = 0$，设行向量 $a_i = (a_{i1}, \ldots, a_{in})$，方程组等价于</p>
+$$(a_i, x) = 0, \quad i = 1, 2, \ldots, m$$
+<p>即解空间 $\mathrm{Null}(A) = \mathrm{Row}(A)^\perp$（行空间的正交补），维数为 $n - r$。</p>
+
+<details class="qa">
+  <summary>Q：正交补与零空间的关系？</summary>
+  <div class="qa-answer">
+    <p>对矩阵 $A \in \mathbb{R}^{m \times n}$，有四个基本子空间：行空间 $\mathrm{Row}(A)$、列空间 $\mathrm{Col}(A)$、零空间 $\mathrm{Null}(A)$、左零空间 $\mathrm{Null}(A^T)$。正交补关系为：</p>
+    $$\mathrm{Null}(A) = \mathrm{Row}(A)^\perp, \qquad \mathrm{Null}(A^T) = \mathrm{Col}(A)^\perp$$
+    <p>这是线性代数基本定理（Fundamental Theorem of Linear Algebra）的核心内容。</p>
+  </div>
+</details>
+</section>
+
+<!-- §5 -->
+<section id="s5">
+<h2 id="s5"><span class="num">§5</span>正交投影变换与正交投影矩阵</h2>
+
+<h3 id="def-1216">定义 1.2.16：正交投影变换</h3>
+<p>设 $V^n = V_1 \oplus V_1^\perp$（正交分解），对任意 $x \in V^n$ 唯一分解 $x = x_1 + x_2$（$x_1 \in V_1,\ x_2 \in V_1^\perp$），定义变换 $\mathcal{A}(x) = x_1$，称 $\mathcal{A}$ 为<strong>沿 $V_1^\perp$ 到 $V_1$ 的正交投影变换</strong>。</p>
+
+<h3 id="deriv-proj">正交投影矩阵的推导</h3>
+<p>设 $e_1, \ldots, e_r$ 是 $V_1$ 的标准正交基，$e_{r+1}, \ldots, e_n$ 是 $V_1^\perp$ 的标准正交基，则在标准正交基 $\{e_1, \ldots, e_n\}$ 下：</p>
+$$\mathcal{A}(e_i) = e_i \quad (i \leq r), \qquad \mathcal{A}(e_i) = \mathbf{0} \quad (i > r)$$
+<p>矩阵表示为分块形式：</p>
+$$A = \begin{pmatrix} I_r & 0 \\ 0 & 0 \end{pmatrix}$$
+<p>可验证 $A^2 = A$（幂等）且 $A^T = A$（对称），这就是正交投影矩阵的基本性质。</p>
+
+<h3 id="thm-1215">定理 1.2.15：正交投影矩阵的等价刻画</h3>
+<p>设 $A$ 是 $n$ 阶实方阵，以下三个条件等价：</p>
+<ol>
+  <li>$A$ 是某个正交分解下的正交投影矩阵</li>
+  <li>$A = A^T A$</li>
+  <li>$A^2 = A = A^T$（幂等且对称）</li>
+</ol>
+<details class="qa">
+  <summary>证明（$1 \Rightarrow 3$）</summary>
+  <div class="qa-answer">
+    <p>由推导，在标准正交基下 $A = \begin{pmatrix} I_r & 0 \\ 0 & 0 \end{pmatrix}$。</p>
+    <p>$A^2 = \begin{pmatrix} I_r & 0 \\ 0 & 0 \end{pmatrix}^2 = \begin{pmatrix} I_r & 0 \\ 0 & 0 \end{pmatrix} = A$（幂等）。</p>
+    <p>$A^T = \begin{pmatrix} I_r & 0 \\ 0 & 0 \end{pmatrix}^T = \begin{pmatrix} I_r & 0 \\ 0 & 0 \end{pmatrix} = A$（对称）。$\blacksquare$</p>
+  </div>
+</details>
+<details class="qa">
+  <summary>证明（$3 \Rightarrow 1$，即 $A^2=A=A^T$ 表示正交投影）</summary>
+  <div class="qa-answer">
+    <p>设 $A^2 = A$（幂等），令 $V_1 = \mathrm{Col}(A)$（像空间），$V_2 = \mathrm{Null}(A)$（零空间）。</p>
+    <p><strong>直和分解：</strong>任意 $x \in \mathbb{R}^n$，令 $x_1 = Ax \in V_1$，$x_2 = x - Ax \in V_2$（因 $A(x-Ax) = Ax - A^2x = 0$），故 $x = x_1 + x_2$，且 $\mathbb{R}^n = V_1 + V_2$。直和性：若 $y \in V_1 \cap V_2$，则 $y = Az$（某 $z$）且 $Ay = 0$，故 $y = Az = A^2z = Ay = 0$。</p>
+    <p><strong>正交性：</strong>对 $x_1 \in V_1 = \mathrm{Col}(A)$ 和 $x_2 \in V_2 = \mathrm{Null}(A)$：</p>
+    $$x_1^T x_2 = (Av)^T x_2 = v^T A^T x_2 = v^T A x_2 = v^T \cdot 0 = 0$$
+    <p>（用了 $A^T = A$）。故 $V_1 \perp V_2$，$A$ 是到 $V_1 = \mathrm{Col}(A)$ 的正交投影。$\blacksquare$</p>
+  </div>
+</details>
+<details class="qa">
+  <summary>证明（$3 \Leftrightarrow 2$）</summary>
+  <div class="qa-answer">
+    <p>$A^2 = A = A^T \Rightarrow A^T A = A \cdot A = A^2 = A$（即条件 2）。</p>
+    <p>反之，$A = A^T A \Rightarrow A^T = (A^T A)^T = A^T A = A$（对称）；再 $A^2 = A^T A = A$。$\blacksquare$</p>
+  </div>
+</details>
+
+<div class="callout callout-warn">
+  <div class="callout-title">注意区分</div>
+  <strong>正交投影矩阵</strong>（$A^2 = A = A^T$）与<strong>正交矩阵</strong>（$A^T A = I$）是两个不同概念：
+  $\begin{bmatrix} 1 & 0 \\ 0 & -1 \end{bmatrix}$ 是正交阵但不是投影阵；
+  $\begin{bmatrix} 1 & 0 \\ 0 & 0 \end{bmatrix}$ 是投影阵但不是正交阵。
+</div>
+
+<details class="qa">
+  <summary>Q：如何从子空间的基矩阵直接构造正交投影矩阵？</summary>
+  <div class="qa-answer">
+    <p>设 $V_1$ 的基矩阵为 $Q$（列向量为 $V_1$ 的一组基，但未必正交），则投影到 $V_1$ 上的正交投影矩阵为</p>
+    $$P = Q(Q^T Q)^{-1} Q^T$$
+    <p>若 $Q$ 的列向量已经是标准正交基（$Q^T Q = I$），则 $P = QQ^T$。验证：$P^2 = QQ^T QQ^T = Q(Q^TQ)Q^T = QQ^T = P$，$P^T = (QQ^T)^T = QQ^T = P$。</p>
+  </div>
+</details>
+</section>
+
+<footer class="note-footer">
+  代数基础 Lecture 10 笔记 · 主讲：阚震 · 整理于 2026-06-04 · mynotes academic_lecture
+</footer>
+</main>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+  // TOC scrollspy
+  var tocLinks = [].slice.call(document.querySelectorAll("nav.toc a"));
+  var headings = tocLinks.map(function (a) {
+    var id = a.getAttribute("href").replace(/^#/, "");
+    return document.getElementById(id);
+  }).filter(Boolean);
+  if (headings.length && typeof IntersectionObserver !== "undefined") {
+    var linkById = new Map();
+    headings.forEach(function (h, i) { linkById.set(h.id, tocLinks[i]); });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        tocLinks.forEach(function (l) { l.classList.remove("active"); });
+        var lk = linkById.get(en.target.id);
+        if (lk) lk.classList.add("active");
+      });
+    }, { rootMargin: "-15% 0px -75% 0px" });
+    headings.forEach(function (h) { io.observe(h); });
+  }
+  // Print: force details open
+  var _stash = [], _printing = false;
+  window.addEventListener("beforeprint", function () {
+    if (_printing) return; _printing = true; _stash = [];
+    document.querySelectorAll("details:not([open])").forEach(function (d) { _stash.push(d); d.open = true; });
+  });
+  window.addEventListener("afterprint", function () {
+    _stash.forEach(function (d) { if (d.isConnected) d.open = false; });
+    _stash = []; _printing = false;
+  });
+})();
+</script>
+</body>
+</html>
