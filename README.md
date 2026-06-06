@@ -35,8 +35,8 @@ Four natural use cases:
 Covers: Courant-Fischer theorem · Hermitian matrix eigenvalue squeeze inequalities · Schur triangularization · normal matrices · orthogonal projectors, with full proofs in folded blocks and a two-level linked TOC.
 
 <p align="center">
-  <img src="examples/alg_lecture10/images/L10-default.png" alt="Lecture 10 — Default theme" width="48%">
-  <img src="examples/alg_lecture10/images/L10-dark.png" alt="Lecture 10 — Dark theme" width="48%">
+  <img src="examples/alg_lecture10/images/L10-default.png" alt="Lecture 10 — Default theme" width="36%">
+  <img src="examples/alg_lecture10/images/L10-dark.png" alt="Lecture 10 — Dark theme" width="36%">
 </p>
 
 <p align="center">
@@ -59,7 +59,7 @@ Workflow: `/notes-split paper.pdf --pages 5` → 3 chunks → `/notes-new` per c
 Covers: CARIMA model derivation · Diophantine recursion · matrix control law · control horizon analysis · comparison table (GMV / DMC / EPSAC / Peterka) · simulation study · numerical appendix — all derivation steps in folded blocks, Q&A auto-generated.
 
 <p align="center">
-  <img src="examples/gpc_part1/images/GPC_Clarke.png" alt="GPC Part I note screenshot" width="80%">
+  <img src="examples/gpc_part1/images/GPC_Clarke.png" alt="GPC Part I note screenshot" width="36%">
 </p>
 
 <p align="center">
