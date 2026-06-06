@@ -45,8 +45,8 @@ Covers: Courant-Fischer theorem · Hermitian matrix eigenvalue squeeze inequalit
 
 | Theme | Link |
 |---|---|
-| Default | [`examples/alg_lecture10/alg_lecture10-default.html`](examples/alg_lecture10/alg_lecture10-default.html) |
-| Dark | [`examples/alg_lecture10/alg_lecture10-dark.html`](examples/alg_lecture10/alg_lecture10-dark.html) |
+| Default | [`examples/alg_lecture10/alg_lecture10-default.html`](https://straw-cpu.github.io/nota/examples/alg_lecture10/alg_lecture10-default.html) |
+| Dark | [`examples/alg_lecture10/alg_lecture10-dark.html`](https://straw-cpu.github.io/nota/examples/alg_lecture10/alg_lecture10-dark.html) |
 
 ---
 
@@ -66,7 +66,7 @@ Covers: CARIMA model derivation · Diophantine recursion · matrix control law �
   <em>12-page paper → interactive HTML with formulas, comparison tables, and folded Q&amp;A (820 lines)</em>
 </p>
 
-→ [`examples/gpc_part1/gpc-part-i-1.html`](examples/gpc_part1/gpc-part-i-1.html)
+→ [`examples/gpc_part1/gpc-part-i-1.html`](https://straw-cpu.github.io/nota/examples/gpc_part1/gpc-part-i-1.html)
 
 ---
 
