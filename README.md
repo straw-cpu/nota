@@ -28,20 +28,55 @@ Four natural use cases:
 
 ## Showcase
 
-A real lecture note — *代数基础 Lecture 10: Hermitian 矩阵与正交投影* — generated end-to-end from a course PDF.
+### Lecture notes: 代数基础 Lecture 10
 
-Covers: Courant-Fischer theorem · Hermitian矩阵特征值夹逼不等式 · Schur三角化 · 正规矩阵 · 正交投影矩阵，with full proofs in folded blocks and a two-level linked TOC.
+*代数基础 Lecture 10: Hermitian 矩阵与正交投影* — generated end-to-end from a course PDF.
 
-→ [`examples/alg_lecture10-default.html`](examples/alg_lecture10-default.html)
+Covers: Courant-Fischer theorem · Hermitian matrix eigenvalue squeeze inequalities · Schur triangularization · normal matrices · orthogonal projectors, with full proofs in folded blocks and a two-level linked TOC.
+
+<p align="center">
+  <img src="examples/alg_lecture10/images/L10-default.png" alt="Lecture 10 — Default theme" width="48%">
+  <img src="examples/alg_lecture10/images/L10-dark.png" alt="Lecture 10 — Dark theme" width="48%">
+</p>
+
+<p align="center">
+  <em>Default theme (left) · Dark theme (right) — switched with <code>/notes-theme</code></em>
+</p>
+
+| Theme | Link |
+|---|---|
+| Default | [`examples/alg_lecture10/alg_lecture10-default.html`](examples/alg_lecture10/alg_lecture10-default.html) |
+| Dark | [`examples/alg_lecture10/alg_lecture10-dark.html`](examples/alg_lecture10/alg_lecture10-dark.html) |
+
+---
+
+### Paper reading: Generalized Predictive Control Part I
+
+*Clarke et al., Automatica 1987* — a 12-page classic control paper turned into an interactive HTML note via `/notes-split` + `/notes-new`.
+
+Workflow: `/notes-split paper.pdf --pages 5` → 3 chunks → `/notes-new` per chunk → merged into a complete note.
+
+Covers: CARIMA model derivation · Diophantine recursion · matrix control law · control horizon analysis · comparison table (GMV / DMC / EPSAC / Peterka) · simulation study · numerical appendix — all derivation steps in folded blocks, Q&A auto-generated.
+
+<p align="center">
+  <img src="examples/gpc_part1/images/GPC_Clarke.png" alt="GPC Part I note screenshot" width="80%">
+</p>
+
+<p align="center">
+  <em>12-page paper → interactive HTML with formulas, comparison tables, and folded Q&amp;A (820 lines)</em>
+</p>
+
+→ [`examples/gpc_part1/gpc-part-i-1.html`](examples/gpc_part1/gpc-part-i-1.html)
 
 ---
 
 ## Skills
 
-Five skills ship with this repo. Point your agent at the `skills/` directory:
+Six skills ship with this repo. Point your agent at the `skills/` directory:
 
 | Skill | Trigger | What it does |
 |---|---|---|
+| `notes-split` | `/notes-split` | Split a PDF into page-granularity chunks → `splits/` subdirectory, as a pre-step for `/notes-new` |
 | `notes-new` | `/notes-new` | Create a new note from source material (PDF, text, or description) |
 | `notes-update` | `/notes-update` | Add sections, Q&A blocks, or rewrite content in an existing note |
 | `notes-theme` | `/notes-theme` | Switch color theme across one file or a whole directory |
@@ -90,8 +125,9 @@ The agent reads the source, builds a complete HTML with all theorems / proofs / 
 ## Structure
 
 ```
-mynotes/
+nota/
 ├── skills/
+│   ├── notes-split/      ← split PDF into page chunks (pre-step)
 │   ├── notes-new/        ← create a note from source material
 │   ├── notes-update/     ← edit / extend an existing note
 │   ├── notes-theme/      ← switch themes
@@ -109,7 +145,9 @@ mynotes/
 │   ├── build_index.py    ← scan HTML, generate navigation page
 │   └── theme_switch.py   ← batch theme replacement
 └── examples/
-    └── alg_lecture10.html
+    ├── alg_lecture10/    ← lecture note (default + dark theme)
+    ├── gpc_part1/        ← paper reading example
+    └── water_tank_gpc/   ← multi-file project summary
 ```
 
 ---

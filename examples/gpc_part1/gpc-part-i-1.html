@@ -1,0 +1,485 @@
+<!-- mynotes template: academic_lecture | source: AI-Offer/academic.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPC Part I — 广义预测控制基础算法</title>
+<meta name="generator" content="mynotes (academic_lecture, v1)">
+<meta name="mynotes:created-at" content="2026-06-06">
+<meta name="mynotes:template" content="academic_lecture">
+<meta name="mynotes:theme" content="default">
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    tags: 'ams'
+  },
+  options: { skipHtmlTags: ['script','noscript','style','textarea'] }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded', () => hljs.highlightAll());</script>
+<style>
+:root {
+  --bg: #fdfcf7; --bg-soft: #f4f1ea; --bg-code: #f8f5ec;
+  --ink: #1a1a1a; --ink-soft: #4a4a4a; --ink-muted: #6b6b6b;
+  --primary: #1a4a8c; --primary-soft: #2d6cb8; --accent: #b8390e;
+  --warn: #b45309; --warn-bg: #fef3c7; --info-bg: #dbeafe;
+  --good-bg: #d1fae5; --good: #065f46; --bad-bg: #fee2e2; --bad: #991b1b;
+  --border: #d6d0c0; --border-soft: #e8e3d5;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: "Source Serif Pro","Source Serif 4","Crimson Pro","Georgia","Songti SC","STSong",serif;
+  line-height: 1.65; color: var(--ink); background: var(--bg);
+  margin: 0; padding: 0; font-size: 16px;
+}
+.layout {
+  max-width: 1280px; margin: 0 auto;
+  display: grid; grid-template-columns: 260px 1fr;
+  gap: 48px; padding: 40px 32px;
+}
+nav.toc {
+  position: sticky; top: 24px; align-self: start; font-size: 13px;
+  max-height: calc(100vh - 48px); overflow-y: auto;
+  border-right: 1px solid var(--border-soft); padding-right: 16px;
+}
+nav.toc h3 { margin: 0 0 12px; font-size: 12px; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--ink-muted); font-weight: 600; }
+nav.toc > ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
+nav.toc > ol > li { margin: 5px 0; counter-increment: toc; }
+nav.toc > ol > li::before { content: counter(toc) ". "; color: var(--ink-muted); margin-right: 4px; }
+nav.toc a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px dotted transparent; }
+nav.toc a:hover { color: var(--primary); border-bottom-color: var(--primary); }
+nav.toc ul { list-style: none; padding-left: 14px; margin: 3px 0; font-size: 12px; }
+nav.toc ul li::before { content: "→ "; color: var(--border); }
+nav.toc a.active { color: var(--accent); font-weight: 600; border-bottom-color: var(--accent); }
+main { min-width: 0; }
+header.hero { border-bottom: 3px double var(--primary); padding-bottom: 24px; margin-bottom: 32px; }
+header.hero .eyebrow { color: var(--ink-muted); font-size: 13px; letter-spacing: 0.01em; font-weight: 400; margin-bottom: 8px; }
+header.hero h1 { font-size: 32px; line-height: 1.2; margin: 0 0 12px; color: var(--ink); font-weight: 700; letter-spacing: -0.01em; }
+header.hero .subtitle { font-size: 16px; color: var(--ink-soft); margin: 0 0 8px; font-style: italic; }
+header.hero .byline { font-size: 14px; color: var(--ink-soft); margin: 0 0 20px; }
+header.hero .byline strong { color: var(--ink); font-weight: 600; }
+header.hero .meta { display: flex; gap: 20px; flex-wrap: wrap; font-size: 12px; color: var(--ink-muted);
+  border-top: 1px solid var(--border-soft); padding-top: 14px; }
+header.hero .meta span strong { color: var(--ink-soft); }
+h2 { font-size: 24px; margin: 44px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  color: var(--ink); font-weight: 700; }
+h2 .num { color: var(--primary); font-weight: 600; margin-right: 8px; }
+h3 { font-size: 19px; margin: 28px 0 10px; color: var(--primary); font-weight: 600; }
+h4 { font-size: 16px; margin: 20px 0 8px; color: var(--ink); font-weight: 600; }
+p { margin: 10px 0; }
+ul, ol { padding-left: 22px; margin: 10px 0; }
+ul li, ol li { margin: 4px 0; }
+ul li::marker { color: var(--primary); }
+strong { color: var(--accent); font-weight: 600; }
+em { color: var(--ink-soft); }
+a { color: var(--primary); }
+a:hover { color: var(--accent); }
+code:not(.hljs) { font-family: "JetBrains Mono","SF Mono","Menlo","Consolas",monospace;
+  font-size: 0.86em; background: var(--bg-code); padding: 1px 5px; border-radius: 3px;
+  border: 1px solid var(--border-soft); color: var(--accent); }
+pre { background: #fafaf6; border: 1px solid var(--border); border-left: 4px solid var(--primary);
+  padding: 0; overflow-x: auto; border-radius: 4px; margin: 14px 0; }
+pre code, pre code.hljs { background: transparent !important; display: block;
+  padding: 14px 18px !important; font-size: 13px; line-height: 1.55;
+  font-family: "JetBrains Mono","SF Mono","Menlo",monospace; color: var(--ink); }
+.callout { margin: 16px 0; padding: 12px 16px; border-radius: 4px; border-left: 4px solid; font-size: 15px; }
+.callout-title { font-weight: 600; margin-bottom: 6px; font-size: 12px;
+  text-transform: uppercase; letter-spacing: 0.06em; }
+.callout-info { background: var(--info-bg); border-left-color: var(--primary); }
+.callout-info .callout-title { color: var(--primary); }
+.callout-warn { background: var(--warn-bg); border-left-color: var(--warn); }
+.callout-warn .callout-title { color: var(--warn); }
+.callout-good { background: var(--good-bg); border-left-color: var(--good); }
+.callout-good .callout-title { color: var(--good); }
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px;
+  border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+thead { background: var(--primary); color: white; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+th { font-weight: 600; font-size: 13px; letter-spacing: 0.02em; }
+tr:last-child td { border-bottom: none; }
+tbody tr:nth-child(even) { background: var(--bg-soft); }
+details.qa, details { background: white; border: 1px solid var(--border-soft); border-radius: 6px; margin: 10px 0; padding: 0; }
+details summary { cursor: pointer; padding: 10px 14px; font-weight: 600; font-size: 14px;
+  color: var(--primary); list-style: none; user-select: none; }
+details summary::-webkit-details-marker { display: none; }
+details summary::before { content: "▸ "; margin-right: 4px; display: inline-block; transition: transform 0.15s; }
+details[open] summary::before { transform: rotate(90deg); }
+details[open] summary { border-bottom: 1px solid var(--border-soft); }
+details > :not(summary) { padding: 10px 14px; }
+mjx-container[display="true"] { margin: 12px 0 !important; }
+mjx-container, .MathJax { text-transform: none !important; }
+p.eq { text-align: center; margin: 16px 0; }
+footer.note-footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border);
+  font-size: 12px; color: var(--ink-muted); }
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; gap: 20px; padding: 20px 16px; }
+  nav.toc { position: static; max-height: none; border-right: none;
+    border-bottom: 1px solid var(--border-soft); padding-right: 0; padding-bottom: 14px; }
+  header.hero h1 { font-size: 24px; } h2 { font-size: 20px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<nav class="toc">
+  <h3>目录</h3>
+  <ol>
+    <li><a href="#abstract">摘要</a></li>
+    <li><a href="#sec1">引言</a></li>
+    <li><a href="#sec2">CARIMA 模型与预测</a>
+      <ul><li><a href="#sec2-1">Diophantine 递推</a></li></ul>
+    </li>
+    <li><a href="#sec3">预测控制律</a>
+      <ul>
+        <li><a href="#sec3-1">控制域 $N_U$</a></li>
+        <li><a href="#sec3-2">域参数选择</a></li>
+      </ul>
+    </li>
+    <li><a href="#sec4">与其他方法的关系</a></li>
+    <li><a href="#sec5">仿真研究</a></li>
+    <li><a href="#sec6">结论</a></li>
+    <li><a href="#appA">附录 A：最小化性质</a></li>
+    <li><a href="#appB">附录 B：一阶系统示例</a></li>
+    <li><a href="#refs">参考文献</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">预测控制 · 经典论文精读</div>
+  <h1>广义预测控制 Part I — 基础算法</h1>
+  <div class="subtitle">Generalized Predictive Control — Part I. The Basic Algorithm</div>
+  <div class="byline"><strong>原著：</strong>D. W. Clarke, C. Mohtadi, P. S. Tuffs &nbsp;·&nbsp; <em>Automatica</em>, Vol. 23, No. 2, 1987</div>
+  <div class="meta">
+    <span><strong>笔记日期：</strong>2026-06-06</span>
+    <span><strong>关键词：</strong>GPC, CARIMA, Diophantine, 预测控制, 自适应控制, 滚动时域</span>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<h2 id="abstract"><span class="num">§0</span>摘要</h2>
+
+<p>现有自整定算法对死时间和模型阶次的先验选择缺乏鲁棒性。本文提出一种新方法——<strong>广义预测控制（GPC）</strong>，仿真研究表明其优于广义最小方差（GMV）和极点配置等公认技术。</p>
+
+<p>该滚动时域方法通过对未来控制动作的假设，在多步内预测被控对象输出。其核心假设是：在"控制域"之后所有控制增量置零——这对鲁棒性和简化计算均有益。通过选取特定的输出域与控制域参数，GPC 可退化为 GMV、EPSAC、Peterka 预测控制器（1984）和 Ydstie 扩展域设计（1984）等子集。</p>
+
+<div class="callout callout-info">
+  <div class="callout-title">核心能力</div>
+  GPC 可控制：非最小相位对象、开环不稳定对象、可变/未知死时间对象、模型过参数化对象，且消除稳态偏差（CARIMA 模型的积分特性）。
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<h2 id="sec1"><span class="num">§1</span>引言</h2>
+
+<p>一个通用自适应控制算法需能处理以下四类挑战：</p>
+<ol>
+  <li><strong>非最小相位对象：</strong>连续时间传递函数在足够快采样速率下会产生单位圆外的离散零点。</li>
+  <li><strong>开环不稳定或阻尼不足对象：</strong>如柔性航天器、机器人。</li>
+  <li><strong>可变/未知死时间：</strong>最小方差自整定器对死时间假设高度敏感。</li>
+  <li><strong>未知阶次对象：</strong>极点配置和 LQG 自整定器在模型阶次过估计时因极零点对消而性能恶化。</li>
+</ol>
+
+<p>GPC 在单一算法中克服了这些问题，可在参数、死时间和模型阶次均发生变化时稳定控制被控对象，对同时具有非最小相位和开环不稳定特性的对象亦有效，且无需特殊预防措施处理过参数化估计。</p>
+
+<p>工业过程扰动通常表现为随机时刻的随机阶跃（确定性情形）或布朗运动（随机情形）。GPC 通过 CARIMA 模型的积分特性自然地具有积分作用，无需人为添加，从而实现无偏差调节。</p>
+
+<h2 id="sec2"><span class="num">§2</span>CARIMA 被控对象模型与输出预测</h2>
+
+<p>在某操作点附近，非线性被控对象通常可以局部线性化为：</p>
+<p class="eq">$$A(q^{-1})y(t) = B(q^{-1})u(t-1) + x(t) \tag{1}$$</p>
+<p>其中 $q^{-1}$ 为后移算子，$A$、$B$ 为多项式：</p>
+<p class="eq">$$A(q^{-1}) = 1 + a_1 q^{-1} + \cdots + a_{n_a} q^{-n_a}, \quad B(q^{-1}) = b_0 + b_1 q^{-1} + \cdots + b_{n_b} q^{-n_b}$$</p>
+<p>$A$ 为首一多项式；若 $b_0 = 0$，则对象含纯滞后（dead-time）。</p>
+
+<p>工业中扰动常为非平稳型，适合建模为 $x(t) = C(q^{-1})\xi(t)/\Delta$，其中 $\Delta = 1-q^{-1}$。合并后得 <strong>CARIMA 模型</strong>：</p>
+<p class="eq">$$A(q^{-1})y(t) = B(q^{-1})u(t-1) + C(q^{-1})\xi(t)/\Delta$$</p>
+
+<div class="callout callout-warn">
+  <div class="callout-title">为什么 CARIMA 而非 CARMA？</div>
+  CARMA 适合平稳扰动；工业扰动多为非平稳型。CARIMA 中 $1/\Delta$ 引入积分，使控制器自然具备积分作用，消除稳态偏差，无需人为添加积分环节。
+</div>
+
+<p>为简化推导，取 $C(q^{-1}) = 1$，得到本文基础模型：</p>
+<p class="eq">$$A(q^{-1})y(t) = B(q^{-1})u(t-1) + \xi(t)/\Delta \tag{5}$$</p>
+<p>等价写法：$\Delta A(q^{-1})y(t) = B(q^{-1})\Delta u(t-1) + \xi(t)$，控制增量 $\Delta u$ 自然出现。</p>
+
+<h3>推导 $j$ 步最优预测器</h3>
+<p>引入 <strong>Diophantine 恒等式</strong>：对每个预测步长 $j$，存在唯一多项式对 $(E_j, F_j)$ 满足：</p>
+<p class="eq">$$1 = E_j(q^{-1})\Delta A(q^{-1}) + q^{-j}F_j(q^{-1}) \tag{6}$$</p>
+<p>其中 $E_j$ 阶次为 $j-1$，$F_j$ 阶次为 $n_a$。</p>
+
+<div class="callout callout-info">
+  <div class="callout-title">Diophantine 方程的作用</div>
+  式(6)将"1"分解为两部分：$E_j \Delta A$（已知量相关）和 $q^{-j}F_j$（延迟项）。这一分解是提取最优预测器的关键，使未来噪声项与已知量完全分离。
+</div>
+
+<p>将式(5)乘以 $E_j \Delta q^j$ 并代入式(6)，得 <strong>$j$ 步最优预测器</strong>：</p>
+<p class="eq">$$\hat{y}(t+j \mid t) = G_j(q^{-1})\Delta u(t+j-1) + F_j(q^{-1})y(t) \tag{8}$$</p>
+<p>其中 $G_j(q^{-1}) = E_j(q^{-1})B(q^{-1})$。由于 $E_j$ 阶次为 $j-1$，噪声项 $E_j\xi(t+j)$ 只含 $\xi(t+1),\ldots,\xi(t+j)$（全为未来量），期望为零。$G_j$ 的系数恰为对象阶跃响应的前 $j$ 项，与 $j$ 无关：$g_{ij} = g_i$（$i &lt; j$）。</p>
+
+<h3 id="sec2-1">2.1 Diophantine 方程的递推计算</h3>
+
+<p>对每个 $j$ 分别数值求解 Diophantine 方程代价过高。更高效的方案是利用相邻步长间的递推关系：给定 $(E_j, F_j)$ 直接得到 $(E_{j+1}, F_{j+1})$。</p>
+
+<p>设 $\tilde{A} = \Delta A$，两步 Diophantine 方程相减并分析多项式结构，得递推关系：</p>
+<p class="eq">$$r_j = f_0 \tag{11a}$$</p>
+<p class="eq">$$s_i = f_{i+1} - \tilde{a}_{i+1} r_j \quad (i = 0, 1, \ldots) \tag{11b}$$</p>
+<p class="eq">$$E_{j+1}(q^{-1}) = E_j(q^{-1}) + q^{-j} r_j \tag{12}$$</p>
+<p class="eq">$$G_{j+1}(q^{-1}) = B(q^{-1}) E_{j+1}(q^{-1}) \tag{13}$$</p>
+
+<div class="callout callout-info">
+  <div class="callout-title">递推含义逐条解释</div>
+  <ul>
+    <li><strong>式(11a)：</strong>递推系数 $r_j$ = 当前 $F_j$ 的常数项 $f_0$（因 $\tilde{A}$ 首项为1）</li>
+    <li><strong>式(11b)：</strong>$F_{j+1}$ 各系数由 $F_j$ 系数向右移位一步并减去修正量 $\tilde{a}_{i+1}r_j$ 得到</li>
+    <li><strong>式(12)：</strong>$E_{j+1}$ = $E_j$ 末尾追加一项 $r_j q^{-j}$，长度每步增加1</li>
+    <li><strong>式(13)：</strong>下一步预测响应多项式直接由 $B \cdot E_{j+1}$ 给出</li>
+  </ul>
+  整个递推仅需少量加减乘法，无需重解 Diophantine 方程，对自适应版本尤为重要。
+</div>
+
+<p><strong>初始化</strong>（$j=1$）：由 $1 = E_1\tilde{A} + q^{-1}F_1$ 且 $\tilde{A}$ 首项为1，得 $E_1 = 1$，$F_1(q^{-1}) = q(1 - \tilde{A}(q^{-1}))$。</p>
+
+<h2 id="sec3"><span class="num">§3</span>预测控制律</h2>
+
+<p>设未来设定值序列 $\{w(t+j)\}$ 已知（通常取当前设定值 $w$ 的常数），滚动时域控制律每个采样步执行以下四步：</p>
+<ol>
+  <li>计算未来设定值序列 $w(t+j)$</li>
+  <li>用预测模型(8)生成预测输出 $\hat{y}(t+j|t)$，注意 $j>k$ 时依赖于待确定的未来控制信号</li>
+  <li>最小化未来误差和控制量的二次代价函数，得到未来控制序列</li>
+  <li>施加第一个控制量 $u(t)$，下一采样步重复上述过程（滚动时域）</li>
+</ol>
+
+<p>代价函数为：</p>
+<p class="eq">$$J(N_1, N_2, N_U, \lambda) = \sum_{j=N_1}^{N_2}\left[\hat{y}(t+j|t)-w(t+j)\right]^2 + \sum_{j=1}^{N_U}\lambda(j)\left[\Delta u(t+j-1)\right]^2 \tag{14}$$</p>
+
+<p>其中 $N_1$ 为最小输出域，$N_2$ 为最大输出域，$\lambda(j)$ 为控制加权序列。第一项惩罚输出跟踪误差，第二项惩罚控制增量幅度，平衡跟踪精度与控制能量。</p>
+
+<p>取 $N_1=1$，$N_2=N$，$\lambda(j)=\lambda$（常数），将 $N$ 步预测写成向量形式：</p>
+<p class="eq">$$\hat{\mathbf{y}} = G\tilde{\mathbf{u}} + \mathbf{f} \tag{15}$$</p>
+
+<p>其中 $\hat{\mathbf{y}} = [\hat{y}(t+1),\ldots,\hat{y}(t+N)]^T$，$\tilde{\mathbf{u}} = [\Delta u(t),\ldots,\Delta u(t+N-1)]^T$，$\mathbf{f}$ 为 $t$ 时刻已知量（历史控制和输出）决定的"自由响应"向量。</p>
+
+<p>矩阵 $G$ 是下三角 Toeplitz 矩阵（阶跃响应系数构成）：</p>
+<p class="eq">$$G = \begin{pmatrix} g_0 & 0 & \cdots & 0 \\ g_1 & g_0 & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ g_{N-1} & g_{N-2} & \cdots & g_0 \end{pmatrix}$$</p>
+
+<p>下三角结构反映因果性：$t+j$ 时刻的输出只受 $\Delta u(t),\ldots,\Delta u(t+j-1)$ 影响。若死时间为 $k>1$，$G$ 前 $k-1$ 行全为零，但 GPC 在此情形下仍能给出稳定解（这是 GPC 对未知死时间鲁棒的关键）。</p>
+
+<p>代价函数展开为：</p>
+<p class="eq">$$J_1 = (G\tilde{\mathbf{u}} + \mathbf{f} - \mathbf{w})^T(G\tilde{\mathbf{u}} + \mathbf{f} - \mathbf{w}) + \lambda\,\tilde{\mathbf{u}}^T\tilde{\mathbf{u}} \tag{16}$$</p>
+
+<p>对 $\tilde{\mathbf{u}}$ 求偏导令其为零（$\partial J_1/\partial\tilde{\mathbf{u}} = 0$）：</p>
+<p class="eq">$$2G^T(G\tilde{\mathbf{u}} + \mathbf{f} - \mathbf{w}) + 2\lambda\tilde{\mathbf{u}} = 0$$</p>
+
+<p>解得 <strong>GPC 最优控制增量向量</strong>：</p>
+<p class="eq">$$\hat{\tilde{\mathbf{u}}} = (G^T G + \lambda I)^{-1} G^T (\mathbf{w} - \mathbf{f}) \tag{17}$$</p>
+
+<div class="callout callout-good">
+  <div class="callout-title">式(17)关键性质</div>
+  <ul>
+    <li>这是标准正则化最小二乘解；$(G^TG + \lambda I)$ 正定，解唯一存在</li>
+    <li>$\lambda > 0$ 时即使 $G^TG$ 奇异（如死时间估计错误）也有唯一解，增强鲁棒性</li>
+    <li>只取第一个元素 $\Delta u(t)$ 施加，即 $u(t) = u(t-1) + \mathbf{g}^T(\mathbf{w}-\mathbf{f})$</li>
+  </ul>
+</div>
+
+<p>实际控制律（取 $\hat{\tilde{\mathbf{u}}}$ 第一行）：</p>
+<p class="eq">$$u(t) = u(t-1) + \mathbf{g}^T(\mathbf{w} - \mathbf{f}) \tag{18}$$</p>
+<p>其中 $\mathbf{g}^T$ 为 $(G^TG+\lambda I)^{-1}G^T$ 的第一行。控制律包含 $u(t-1)$，即对 $\Delta u$ 积分，自然具备积分作用。</p>
+
+<p>可验证：由 Diophantine 方程(6)在 $q=1$ 处，$F_j(1)=1$（因 $\Delta A(1)=0$），故自由响应 $f(t+j)$ 的稳态值等于 $y(t)$，从而保证常值设定点下无稳态偏差。</p>
+
+<h3 id="sec3-1">3.1 控制域（Control Horizon）$N_U$</h3>
+
+<p>在 $N_U < N$ 之后假设控制增量为零：</p>
+<p class="eq">$$\Delta u(t+j-1) = 0, \quad j > N_U \tag{19}$$</p>
+
+<p>此假设等价于对后续控制变化施加无穷大权重。$\tilde{\mathbf{u}}$ 维度降为 $N_U$，矩阵 $G$ 变为 $N \times N_U$ 矩阵 $G_1$（右侧列截断），控制律更新为：</p>
+<p class="eq">$$\hat{\tilde{\mathbf{u}}} = (G_1^T G_1 + \lambda I)^{-1} G_1^T (\mathbf{w} - \mathbf{f}) \tag{20}$$</p>
+<p>求逆矩阵维度从 $N \times N$ 降为 $N_U \times N_U$。$N_U=1$ 时退化为标量运算，计算极为高效。</p>
+
+<div class="callout callout-info">
+  <div class="callout-title">引入 $N_U$ 的三重作用</div>
+  <ol>
+    <li><strong>稳定非最小相位对象：</strong>$\lambda=0$ 时的最小方差律引入与非最小相位零点对应的控制信号增长模式；通过限制控制域可约束这些模式，即使 $\lambda=0$ 也能稳定闭环</li>
+    <li><strong>降低计算量：</strong>矩阵求逆维度从 $N^2$ 降为 $N_U^2$，$N_U=1$ 时为标量</li>
+    <li><strong>控制闭环极点：</strong>$N_U$ 至少等于不稳定或阻尼不足极点数目时可获得良好控制</li>
+  </ol>
+</div>
+
+<h3 id="sec3-2">3.2 输出域与控制域的选择</h3>
+
+<p><strong>$N_1$（最小输出域）：</strong>若死时间 $k$ 精确已知，取 $N_1 = k$（$j < k$ 的预测不受 $u(t)$ 影响，计算多余）；死时间未知时取 $N_1=1$，并扩大 $B$ 的阶数覆盖可能的死时间范围。</p>
+
+<p><strong>$N_2$（最大输出域）：</strong>对含非最小相位性（初始响应为负）的对象，$N_2$ 需超过 $\deg B(q^{-1})$，使后续正向响应样本包含在代价中。实践中建议 $N_2$ 接近对象上升时间。</p>
+
+<p><strong>$N_U$（控制域）：</strong>最关键的设计参数：</p>
+<ul>
+  <li>对简单稳定对象（含死时间和非最小相位性），$N_U=1$ 通常给出可接受控制</li>
+  <li>对复杂系统，$N_U$ 至少等于不稳定或阻尼不足极点数目</li>
+  <li>增大 $N_U$ 使控制更激进；超过某阈值后继续增大几乎无改善</li>
+  <li>从零开始增大 $\lambda$ 可进一步阻尼控制动作</li>
+</ul>
+
+<div class="callout callout-good">
+  <div class="callout-title">默认参数推荐</div>
+  对工业过程控制：$N_1=1$，$N_2 \approx$ 对象上升时间，$N_U=1$，$\lambda$ 从0开始调整。大多数场合无需精细整定即可获得合理性能。
+</div>
+
+<h2 id="sec4"><span class="num">§4</span>与其他方法的关系</h2>
+
+<p>GPC 融合五个核心思想：①CARIMA 模型；②超过死时间的有限域长程预测；③递推 Diophantine 方程；④控制增量加权；⑤控制域（域后增量置零）。以下各方法均为 GPC 的特例：</p>
+
+<table>
+  <thead><tr><th>方法</th><th>GPC 退化条件</th><th>局限性</th></tr></thead>
+  <tbody>
+    <tr><td>IDCOM (Richalet 1978)</td><td>无精确对应</td><td>仅限全零模型；不适用于开环不稳定/非最小相位对象</td></tr>
+    <tr><td>DMC (Cutler 1980)</td><td>阶跃响应模型 + 控制域</td><td>不适用开环不稳定；启发式处理偏差</td></tr>
+    <tr><td>GMV (Clarke 1975)</td><td>$N_1=N_2=k$，$N_U=1$</td><td>对变死时间敏感；只能稳定特定非最小相位对象</td></tr>
+    <tr><td>Ydstie (1984)</td><td>$N_1=N_2=d>k$，$N_U=1$，$\lambda=0$，CARMA</td><td>使用 CARMA 模型；阻尼不足极点时不稳定</td></tr>
+    <tr><td>EPSAC (De Keyser 1985)</td><td>$N_1=1$，$N_2=d$，$N_U=1$，$\lambda=0$，CARIMA</td><td>与默认参数 GPC 最接近</td></tr>
+    <tr><td>Peterka (1984)</td><td>哲学相近，但集中于 $N_2\to\infty$</td><td>无限域无法处理约束；矩阵分解推导较复杂</td></tr>
+  </tbody>
+</table>
+
+<p>GPC 本质上是有限域方法，带受限控制域，因而可通过修改将约束（控制饱和、输出界限）纳入计算——这是无限域设计无法实现的推广。</p>
+
+<h2 id="sec5"><span class="num">§5</span>仿真研究</h2>
+
+<p>在一个死时间、阶次和参数均发生大幅变化的被控对象上，对比固定 PID、自适应 GMV、自适应极点配置和自适应 GPC 四种方法（均使用标准递推最小二乘，遗忘因子0.9，无噪声）。</p>
+
+<p>仿真被控对象按每 80 步切换一次（共400步）：</p>
+<table>
+  <thead><tr><th>编号</th><th>采样区间</th><th>传递函数（连续时间）</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>1–79</td><td>$\dfrac{1}{1+10s+40s^2}$（二阶稳定）</td></tr>
+    <tr><td>2</td><td>80–159</td><td>$\dfrac{e^{-2s}}{1+10s+40s^2}$（含死时间）</td></tr>
+    <tr><td>3</td><td>160–239</td><td>$\dfrac{e^{-0.7s}}{1+10s}$（一阶+小死时间）</td></tr>
+    <tr><td>4</td><td>240–319</td><td>$\dfrac{1}{1+10s}$（一阶稳定）</td></tr>
+    <tr><td>5</td><td>320–400</td><td>$\dfrac{1}{10s(1+2.5s)}$（积分+一阶，开环不稳定）</td></tr>
+  </tbody>
+</table>
+
+<p><strong>结果汇总：</strong></p>
+<ul>
+  <li><strong>固定 PID：</strong>模型1和5尚可，其余因增益过大而性能不佳；模型3/4出现稳态偏差</li>
+  <li><strong>自适应 GMV：</strong>模型2下弱阻尼振荡；整体优于固定PID</li>
+  <li><strong>自适应极点配置：</strong>模型3/4（一阶）因 Diophantine 解奇异而完全失效；验证了对模型阶次变化敏感的问题</li>
+  <li><strong>自适应 GPC</strong>（$N_1=1$，$N_2=10$，$N_U=1$，固定不变）：所有模型下均表现优异，每次换模型最多两步设定值跳变即可完全适应，无任何不稳定迹象</li>
+</ul>
+
+<div class="callout callout-good">
+  <div class="callout-title">GPC 的关键优势</div>
+  即使面对从稳定二阶到开环不稳定积分对象的剧烈切换，GPC 使用相同的默认参数均能稳定运行，而其他三种方法均在某些对象上失效。
+</div>
+
+<h2 id="sec6"><span class="num">§6</span>结论</h2>
+
+<p>GPC 是一种新型鲁棒算法，适用于具有挑战性的自适应控制应用。推导和实现均简便；短控制域时可在微计算机上运行。</p>
+<p>GPC 是 GMV 的进一步推广，可配备设计多项式和传递函数，继承 GMV 的理论框架。Part II 论文进一步探讨这些思想，给出 GPC 参数选择的稳定性理论依据，并展示更复杂控制任务上的仿真。</p>
+
+<h2 id="appA"><span class="num">附录A</span>GPC 最小化性质</h2>
+
+<p>考虑代价函数（含随机噪声）：</p>
+<p class="eq">$$J_1 = E\left\{(\mathbf{y}-\mathbf{w})^T(\mathbf{y}-\mathbf{w}) + \lambda\tilde{\mathbf{u}}^T\tilde{\mathbf{u}}\right\}, \quad \mathbf{y} = G\tilde{\mathbf{u}} + \mathbf{f} + \mathbf{e}$$</p>
+<p>其中 $\mathbf{e} = [E_1\xi(t+1), E_2\xi(t+2), \ldots, E_N\xi(t+N)]^T$。</p>
+
+<h3>A.1 开环反馈最优（OLFO）</h3>
+<p>假设未来控制序列与未来测量无关（开环施加），则 $E\{\tilde{\mathbf{u}}^T G^T \mathbf{e}\} = 0$，对 $\tilde{\mathbf{u}}$ 求导置零得：</p>
+<p class="eq">$$\tilde{\mathbf{u}} = (G^TG + \lambda I)^{-1}G^T(\mathbf{w} - \mathbf{f})$$</p>
+<p>这正是主文的控制律(17)。</p>
+
+<h3>A.2 闭环反馈最优（CLFO）等价性</h3>
+<p>对于 CARIMA（自回归型）扰动模型，可以证明：在因果性约束（$\Delta u(t+i)$ 只依赖 $t+i$ 时刻及之前的数据）下，CLFO 最优解与 OLFO 解等价。</p>
+<p>证明思路：从最后一个控制量 $\Delta u(t+N-1)$ 反向递推，每步利用未来噪声的不可预见性（$E\{\Delta u(t+i)\xi(t+j)\}=0$，$j>i$），说明每步最优决策均等价于假设 $\xi(t+j)=0$（$j>i$）时的结果，最终第一步 $\Delta u(t)$ 的最优解与 OLFO 相同。</p>
+
+<div class="callout callout-info">
+  <div class="callout-title">意义</div>
+  GPC 的开环假设不是一种近似——对自回归型扰动模型，它恰好给出与闭环最优策略相同的第一步控制量。这为 GPC 的最优性提供了理论保证。
+</div>
+
+<h2 id="appB"><span class="num">附录B</span>一阶系统示例</h2>
+
+<p>考虑含非最小相位零点的一阶系统（含分数死时间）：</p>
+<p class="eq">$$(1 + a_1 q^{-1})y(t) = (b_0 + b_1 q^{-1})u(t-1)$$</p>
+<p>取数值 $a_1 = -0.9$，$b_0 = 1$，$b_1 = 2$，即：</p>
+<p class="eq">$$(1 - 0.9q^{-1})y(t) = (1 + 2q^{-1})u(t-1)$$</p>
+<p>注意 $B$ 的根为 $q^{-1}=-0.5$，即 $q=−2$（单位圆外零点），是非最小相位系统。</p>
+
+<h3>B.1 递推 Diophantine 计算示例</h3>
+<p>由 $\tilde{A} = \Delta A = (1-q^{-1})(1-0.9q^{-1}) = 1 - 1.9q^{-1} + 0.9q^{-2}$，递推结果：</p>
+<p class="eq">$$E_1=1,\ f_0^{(1)}=1.9,\ f_1^{(1)}=-0.9$$</p>
+<p class="eq">$$E_2=1+1.9q^{-1},\ f_0^{(2)}=2.71,\ f_1^{(2)}=-1.71$$</p>
+<p class="eq">$$E_3=1+1.9q^{-1}+2.71q^{-2},\ f_0^{(3)}=3.439,\ f_1^{(3)}=-2.439$$</p>
+<p>阶跃响应系数：$g_0=1,\ g_1=3.9,\ g_2=6.51$（与 $G_j = E_j B$ 一致）。</p>
+
+<h3>B.2 不同 $N_2$ 下的闭环极点（$N_U=1$，$\lambda=0$）</h3>
+<table>
+  <thead><tr><th>$N_2$</th><th>闭环极点</th><th>稳定性</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>$1-0.09q^{-1}$（对消非最小相位零点）</td><td>不稳定（零点对消律）</td></tr>
+    <tr><td>2（$> \deg B$）</td><td>$1-0.416q^{-1}$</td><td>稳定（极点在单位圆内）</td></tr>
+    <tr><td>3</td><td>$1-0.416q^{-1}$</td><td>稳定，极点趋向开环极点</td></tr>
+  </tbody>
+</table>
+
+<div class="callout callout-warn">
+  <div class="callout-title">关键结论</div>
+  $N_2=1$（$\le \deg B$）时控制律对消非最小相位零点，导致闭环不稳定。$N_2 > \deg B$ 即可稳定。对一般一阶系统，可证明 $N_2 > \deg B(q^{-1}) + k - 1$ 即可稳定所有开环稳定对象（前提是直流增益符号正确）。
+</div>
+
+<h2 id="refs"><span class="num">参考</span>主要参考文献</h2>
+<ul>
+  <li>Clarke, D.W., Mohtadi, C., &amp; Tuffs, P.S. (1987). Generalized predictive control — Part I. The basic algorithm. <em>Automatica</em>, 23(2), 137–148.</li>
+  <li>Clarke, D.W. &amp; Gawthrop, P.J. (1975). Self-tuning controller. <em>Proc. IEE</em>, 122, 929–934.</li>
+  <li>Cutler, C.R. &amp; Ramaker, B.L. (1980). Dynamic Matrix Control. JACC, San Francisco.</li>
+  <li>Richalet, J. et al. (1978). Model predictive heuristic control. <em>Automatica</em>, 14, 413–428.</li>
+  <li>Peterka, V. (1984). Predictor-based self-tuning control. <em>Automatica</em>, 20, 39–50.</li>
+  <li>Ydstie, B.E. (1984). Extended horizon adaptive control. IFAC 9th World Congress.</li>
+  <li>De Keyser, R.M.C. &amp; Van Cauwenberghe, A.R. (1985). Extended prediction self-adaptive control. IFAC Symp.</li>
+</ul>
+
+<footer class="note-footer">
+  mynotes academic_lecture · GPC Part I 精读笔记 · Clarke, Mohtadi &amp; Tuffs (1987) · 笔记日期：2026-06-06
+</footer>
+</main>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var tocLinks = [].slice.call(document.querySelectorAll("nav.toc a"));
+  var headings = tocLinks.map(function (a) {
+    var id = a.getAttribute("href").replace(/^#/, "");
+    return document.getElementById(id);
+  }).filter(Boolean);
+  if (headings.length && typeof IntersectionObserver !== "undefined") {
+    var linkById = new Map();
+    headings.forEach(function (h, i) { linkById.set(h.id, tocLinks[i]); });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        tocLinks.forEach(function (l) { l.classList.remove("active"); });
+        var lk = linkById.get(en.target.id);
+        if (lk) lk.classList.add("active");
+      });
+    }, { rootMargin: "-15% 0px -75% 0px" });
+    headings.forEach(function (h) { io.observe(h); });
+  }
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details:not([open])").forEach(function (d) { d.open = true; });
+  });
+})();
+</script>
+</body>
+</html>
