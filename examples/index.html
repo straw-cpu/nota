@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ZBFB Examples · mynotes</title>
+<title>Examples · mynotes</title>
 <style>
   :root {
     --primary: #1a4a8c;
@@ -12,7 +12,6 @@
     --ink:     #1a1a1a;
     --muted:   #6b6b6b;
     --border:  #d4cfc4;
-    --hover:   #eef2fa;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,11 +38,7 @@
     font-family: "Helvetica Neue", Arial, sans-serif;
     margin-bottom: 0.5rem;
   }
-  header h1 {
-    font-size: 1.75rem;
-    color: var(--primary);
-    font-weight: 700;
-  }
+  header h1 { font-size: 1.75rem; color: var(--primary); font-weight: 700; }
   header .subtitle {
     margin-top: 0.45rem;
     color: var(--muted);
@@ -51,19 +46,31 @@
     font-family: "Helvetica Neue", Arial, sans-serif;
   }
 
+  .section-label {
+    max-width: 780px;
+    margin: 2rem auto 0.75rem;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.4rem;
+  }
+
   .card-list {
     max-width: 780px;
-    margin: 2rem auto 0;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 1.1rem;
+    gap: 0.9rem;
   }
 
   .card {
     background: #fff;
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 1.2rem 1.4rem;
+    padding: 1.1rem 1.4rem;
     display: flex;
     align-items: flex-start;
     gap: 1.2rem;
@@ -75,7 +82,7 @@
   }
 
   .card-num {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: var(--border);
     line-height: 1;
@@ -85,19 +92,29 @@
   }
 
   .card-body { flex: 1; }
-  .card-title {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: var(--primary);
-    margin-bottom: 0.3rem;
-  }
+  .card-title { font-size: 1.02rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem; }
   .card-title a { color: inherit; text-decoration: none; }
   .card-title a:hover { color: var(--accent); text-decoration: underline; }
   .card-desc {
-    font-size: 0.88rem;
+    font-size: 0.87rem;
     color: var(--muted);
     font-family: "Helvetica Neue", Arial, sans-serif;
     line-height: 1.5;
+  }
+  .card-tags {
+    margin-top: 0.4rem;
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .tag {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.72rem;
+    color: var(--primary);
+    border: 1px solid #b8cfe8;
+    border-radius: 3px;
+    padding: 0.1rem 0.45rem;
+    background: #eef4fc;
   }
 
   .card-link {
@@ -112,10 +129,7 @@
     text-decoration: none;
     transition: background 0.12s, color 0.12s;
   }
-  .card-link:hover {
-    background: var(--primary);
-    color: #fff;
-  }
+  .card-link:hover { background: var(--primary); color: #fff; }
 
   footer {
     max-width: 780px;
@@ -131,55 +145,100 @@
 <body>
 
 <header>
-  <div class="eyebrow">ZBFB · mynotes</div>
-  <h1>Examples</h1>
-  <div class="subtitle">三份固化 HTML 成品 · 液流电池数字孪生项目展示材料</div>
+  <div class="eyebrow">nota · examples</div>
+  <h1>示例展示</h1>
+  <div class="subtitle">nota skill 生成的 HTML 笔记成品 — 课堂讲义 · 文献阅读 · 项目归纳</div>
 </header>
 
+<div class="section-label">课堂讲义</div>
 <div class="card-list">
 
   <div class="card">
     <div class="card-num">01</div>
     <div class="card-body">
       <div class="card-title">
-        <a href="zbfb_lecture_set/index.html">液流电池数字孪生 · 学习笔记集</a>
+        <a href="alg_lecture10/alg_lecture10-default.html">代数基础 Lecture 10 — Default 主题</a>
       </div>
       <div class="card-desc">
-        全栈四层架构（Layer A 微观 / B 宏观 ROM / C EKF / D MPC）系统教案，共 9 节 HTML，含答疑与仿真改进计划。
+        Hermitian 矩阵与正交投影：Courant-Fischer 定理、特征值夹逼、Schur 三角化、正规矩阵，所有证明完整展开，带两级可跳转目录。
+      </div>
+      <div class="card-tags">
+        <span class="tag">academic_lecture</span>
+        <span class="tag">default 主题</span>
+        <span class="tag">MathJax</span>
+        <span class="tag">折叠证明</span>
       </div>
     </div>
-    <a class="card-link" href="zbfb_lecture_set/index.html">目录 →</a>
+    <a class="card-link" href="alg_lecture10/alg_lecture10-default.html">打开 →</a>
   </div>
 
   <div class="card">
     <div class="card-num">02</div>
     <div class="card-body">
       <div class="card-title">
-        <a href="zbfb_interview_cheatsheet.html">ZBFB 面试速查手册</a>
+        <a href="alg_lecture10/alg_lecture10-dark.html">代数基础 Lecture 10 — Dark 主题</a>
       </div>
       <div class="card-desc">
-        一页式面试准备速查表：核心公式、关键参数、常见面试题与标准回答框架，适合快速复习。
+        同上内容，暗色配色版本，展示 <code>/notes-theme</code> 一键切换主题效果。
+      </div>
+      <div class="card-tags">
+        <span class="tag">academic_lecture</span>
+        <span class="tag">dark 主题</span>
       </div>
     </div>
-    <a class="card-link" href="zbfb_interview_cheatsheet.html">打开 →</a>
+    <a class="card-link" href="alg_lecture10/alg_lecture10-dark.html">打开 →</a>
   </div>
+
+</div>
+
+<div class="section-label">文献阅读</div>
+<div class="card-list">
 
   <div class="card">
     <div class="card-num">03</div>
     <div class="card-body">
       <div class="card-title">
-        <a href="zbfb_poster_cvpr.html">ZBFB 海报 · CVPR 风格</a>
+        <a href="gpc_part1/gpc-part-i-1.html">GPC Part I — 广义预测控制基本算法</a>
       </div>
       <div class="card-desc">
-        会议海报版式：项目方法、实验结果可视化与结论，采用 CVPR 学术海报排版风格。
+        Clarke et al., Automatica 1987。从 CARIMA 模型推导、Diophantine 递推、控制律到仿真对比，全文 12 页转化为带公式、对比表、折叠 Q&amp;A 的交互式笔记。
+      </div>
+      <div class="card-tags">
+        <span class="tag">academic_lecture</span>
+        <span class="tag">文献阅读</span>
+        <span class="tag">MathJax</span>
+        <span class="tag">notes-split + notes-new</span>
       </div>
     </div>
-    <a class="card-link" href="zbfb_poster_cvpr.html">打开 →</a>
+    <a class="card-link" href="gpc_part1/gpc-part-i-1.html">打开 →</a>
   </div>
 
 </div>
 
-<footer>mynotes examples · ZBFB 液流电池数字孪生 · 2026-06-04</footer>
+<div class="section-label">项目归纳</div>
+<div class="card-list">
+
+  <div class="card">
+    <div class="card-num">04</div>
+    <div class="card-body">
+      <div class="card-title">
+        <a href="water_tank_gpc/index.html">水箱液位 GPC 控制实验</a>
+      </div>
+      <div class="card-desc">
+        多文件结构示例（index + 7 个章节页）。涵盖 ARX 系统辨识、CARIMA 模型、丢番图递推、阶梯式 GPC、RLS 在线辨识到 C++ 工程实现的完整项目流程。
+      </div>
+      <div class="card-tags">
+        <span class="tag">minimal_slide</span>
+        <span class="tag">多文件项目</span>
+        <span class="tag">项目归纳</span>
+      </div>
+    </div>
+    <a class="card-link" href="water_tank_gpc/index.html">目录 →</a>
+  </div>
+
+</div>
+
+<footer>nota examples · 生成于 2026-06-05</footer>
 
 </body>
 </html>
