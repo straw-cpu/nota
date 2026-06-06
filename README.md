@@ -70,6 +70,28 @@ Covers: CARIMA model derivation · Diophantine recursion · matrix control law �
 
 ---
 
+### Project summary: Water Tank GPC Control
+
+Multi-file structure example (index + 7 section pages), covering a full project from theory to hardware:
+
+**Theory → experiment adaptation → verification → simulation → C++ implementation**
+
+<p align="center">
+  <img src="examples/water_tank_gpc/images/arx_identification.png" alt="ARX system identification" width="36%">
+  <img src="examples/water_tank_gpc/images/gpc_sim.png" alt="GPC simulation" width="28%">
+  <img src="examples/water_tank_gpc/images/gpc_exp.jpg" alt="GPC hardware test" width="32%">
+</p>
+
+<p align="center">
+  <em>System identification (ARX model validation) · simulation (closed-loop step response) · hardware-in-the-loop test</em>
+</p>
+
+Covers: ARX system ID · CARIMA model · Diophantine recursion · stepped GPC · RLS online identification · tuning cheat sheet.
+
+→ [`examples/water_tank_gpc/index.html`](https://straw-cpu.github.io/nota/examples/water_tank_gpc/index.html)
+
+---
+
 ## Skills
 
 Six skills ship with this repo. Point your agent at the `skills/` directory:
