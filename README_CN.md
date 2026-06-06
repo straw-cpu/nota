@@ -149,6 +149,7 @@ agent 读取源材料，生成包含所有定理 / 证明 / 例题的完整 HTML
 ```
 nota/
 ├── skills/
+│   ├── notes-split/      ← 按页数拆分 PDF（前置步骤）
 │   ├── notes-new/        ← 从源材料新建笔记
 │   ├── notes-update/     ← 编辑 / 扩展已有笔记
 │   ├── notes-theme/      ← 切换主题

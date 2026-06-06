@@ -99,12 +99,12 @@ Three production-ready templates:
 
 ## Themes
 
-| Theme | Status |
-|---|---|
-| `default` | Gray-red academic palette |
-| `dark` | Dark background, red/blue accents |
-| `solarized` | *Coming soon* |
-| `custom` | Drop your own CSS variables |
+| Theme | Status | Description |
+|---|---|---|
+| `default` | ✅ ready | Gray-red academic palette |
+| `dark` | ✅ ready | Dark background, red/blue accents |
+| `solarized` | 🚧 coming soon | Solarized Light warm-yellow base |
+| `custom` | ✅ ready | Drop your own CSS variables |
 
 ---
 
